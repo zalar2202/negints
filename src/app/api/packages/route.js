@@ -74,6 +74,11 @@ export async function POST(request) {
         await connectDB();
         const body = await request.json();
         
+        // Sanitize empty SKU to null (sparse unique index only ignores null, not "")
+        if (body.sku !== undefined && body.sku !== null && String(body.sku).trim() === '') {
+            body.sku = null;
+        }
+        
         const newPackage = new Package(body);
         await newPackage.save();
 

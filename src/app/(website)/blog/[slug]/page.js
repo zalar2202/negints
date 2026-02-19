@@ -51,7 +51,7 @@ export async function generateMetadata({ params }) {
             title: title,
             description: description,
             url: `${baseUrl}/blog/${slug}`,
-            siteName: "NeginTS",
+            siteName: "نگین تجهیز سپهر",
             type: "article",
             publishedTime: post.publishedAt,
             modifiedTime: post.updatedAt,

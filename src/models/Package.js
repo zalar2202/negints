@@ -111,6 +111,24 @@ const PackageSchema = new mongoose.Schema(
     }
 );
 
+// Convert empty SKU to null so the sparse unique index works correctly.
+// MongoDB sparse indexes only skip documents where the field is null/undefined,
+// not empty strings – so two products with sku: "" would collide.
+PackageSchema.pre('save', function (next) {
+    if (this.sku !== undefined && this.sku !== null && this.sku.trim() === '') {
+        this.sku = null;
+    }
+    next();
+});
+
+PackageSchema.pre('findOneAndUpdate', function (next) {
+    const update = this.getUpdate();
+    if (update && update.sku !== undefined && update.sku !== null && String(update.sku).trim() === '') {
+        update.sku = null;
+    }
+    next();
+});
+
 const Package = mongoose.models.Package || mongoose.model('Package', PackageSchema);
 
 export default Package;

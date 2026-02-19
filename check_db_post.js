@@ -1,28 +1,42 @@
-import dbConnect from './src/lib/mongodb.js';
-import BlogPost from './src/models/BlogPost.js';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
+import BlogPost from './src/models/BlogPost.js';
+import dbConnect from './src/lib/mongodb.js';
 
-dotenv.config();
+dotenv.config({ path: '.env.local' });
 
 async function checkPost() {
-    await dbConnect();
-    const slug = 'personaplex explained real time conversational ai in 2026';
-    const postBySpaceSlug = await BlogPost.findOne({ slug });
-    
-    const hyphenatedSlug = 'personaplex-explained-real-time-conversational-ai-in-2026';
-    const postByHyphenatedSlug = await BlogPost.findOne({ slug: hyphenatedSlug });
-
-    console.log('Post by space slug:', postBySpaceSlug ? 'FOUND' : 'NOT FOUND');
-    if (postBySpaceSlug) {
-        console.log('Space Slug SEO:', JSON.stringify(postBySpaceSlug.seo));
+    try {
+        await dbConnect();
+        const posts = await BlogPost.find({}).select('title slug').limit(20);
+        console.log('Existing Posts:');
+        posts.forEach(p => {
+            console.log(`- Title: ${p.title}`);
+            console.log(`  Slug:  ${p.slug}`);
+        });
+        
+        // Specifically check for the one in the user's URL
+        const targetSlug = "چگونه-دستگاه-تصفیه-هوا-سلامت-خانواده-را-تضمین-میکند";
+        const post = await BlogPost.findOne({ slug: targetSlug });
+        console.log('\nSearch for target slug:', targetSlug);
+        if (post) {
+            console.log('✅ Found Post:', post.title);
+        } else {
+            console.log('❌ Post NOT FOUND by exact slug');
+            
+            // Try searching with regex or just title
+            const closeMatch = await BlogPost.findOne({ title: new RegExp('چگونه دستگاه تصفیه هوا', 'i') });
+            if (closeMatch) {
+                console.log('💡 Found similar post by title:', closeMatch.title);
+                console.log('   Actual Slug in DB:', closeMatch.slug);
+            }
+        }
+    } catch (err) {
+        console.error(err);
+    } finally {
+        process.exit();
     }
-
-    console.log('Post by hyphenated slug:', postByHyphenatedSlug ? 'FOUND' : 'NOT FOUND');
-    if (postByHyphenatedSlug) {
-        console.log('Hyphenated Slug SEO:', JSON.stringify(postByHyphenatedSlug.seo));
-    }
-    
-    process.exit(0);
 }
 
 checkPost();

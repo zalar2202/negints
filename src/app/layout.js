@@ -87,12 +87,12 @@ const themeScript = `
 `;
 
 export const metadata = {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://negints.com"),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://negints.ir"),
     title: {
-        default: "نگین تجهیز سپهر (NeginTS)",
-        template: "%s | NeginTS",
+        default: "نگین تجهیز سپهر | تجهیزات تخصصی پزشکی و مهندسی پزشکی",
+        template: "%s | نگین تجهیز سپهر",
     },
-    description: "NeginTS - Specialized Medical & Engineering Solutions | نگین تجهیز سپهر",
+    description: "نگین تجهیز سپهر - ارائه دهنده راهکارهای نوین در تجهیزات پزشکی و مهندسی پزشکی",
     icons: {
         icon: [
             { url: "/assets/favicon/favicon.ico" },
@@ -111,24 +111,23 @@ export const metadata = {
     openGraph: {
         type: "website",
         locale: "fa_IR",
-        url: "https://negints.com",
-        siteName: "NeginTS",
-        title: "نگین تجهیز سپهر - تجهیزات پزشکی و مهندسی",
+        url: "https://negints.ir",
+        siteName: "نگین تجهیز سپهر",
+        title: "نگین تجهیز سپهر | تجهیزات تخصصی پزشکی و مهندسی پزشکی",
         description: "ارائه دهنده راهکارهای نوین در تجهیزات پزشکی و مهندسی پزشکی",
         images: [
             {
                 url: "/assets/logo/negints-logo.png",
                 width: 512,
                 height: 512,
-                alt: "NeginTS Logo",
+                alt: "نگین تجهیز سپهر",
             },
         ],
     },
     twitter: {
         card: "summary_large_image",
-        title: "NeginTS - نگین تجهیز سپهر",
+        title: "نگین تجهیز سپهر | تجهیزات تخصصی پزشکی",
         description: "ارائه دهنده راهکارهای نوین در تجهیزات پزشکی و مهندسی پزشکی",
-
         images: ["/assets/logo/negints-logo.png"],
     },
 };
