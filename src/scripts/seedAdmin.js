@@ -9,21 +9,8 @@
  */
 
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-
-// Load environment variables if not in production
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-try {
-    const envPath = join(__dirname, "../../.env.local");
-    dotenv.config({ path: envPath });
-} catch (error) {
-    // In production/docker, env vars are already set
-    console.log("ℹ️ Skipping .env.local loading, using environment variables.");
-}
+// In production/docker, env vars are already set.
+// In development, you can use .env.local via command line or manual injection.
 
 // Import User model (must be after env vars are loaded)
 import User from "../models/User.js";

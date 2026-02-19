@@ -1,17 +1,5 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-try {
-    const envPath = join(__dirname, "../../.env.local");
-    dotenv.config({ path: envPath });
-} catch (error) {
-    console.log("ℹ️ Skipping .env.local loading");
-}
+// Environment variables should be set in the host environment or .env.local
 
 import Package from "../models/Package.js";
 
