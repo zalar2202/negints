@@ -6,6 +6,8 @@ import WebsiteThemeToggle from "@/components/website/layout/WebsiteThemeToggle";
 import { MoveLeft, ChevronLeft } from "lucide-react";
 import CommentSection from "@/components/website/CommentSection";
 import "@/styles/blog.css";
+import dbConnect from "@/lib/mongodb";
+import BlogPost from "@/models/BlogPost";
 
 export const dynamic = "force-dynamic";
 
@@ -87,19 +89,24 @@ export async function generateMetadata({ params }) {
 
 async function getPost(slug) {
     try {
+        await dbConnect();
         // Remove trailing slash if present
         const cleanSlug = slug.endsWith('/') ? slug.slice(0, -1) : slug;
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const res = await fetch(`${baseUrl}/api/blog/posts/${encodeURIComponent(cleanSlug)}?t=${Date.now()}`, {
-            cache: "no-store",
-        });
+        // Decode in case the slug arrives URL-encoded
+        const decodedSlug = decodeURIComponent(cleanSlug);
         
-        if (!res.ok) {
-            return null;
-        }
+        const post = await BlogPost.findOne({ slug: decodedSlug, status: 'published' })
+            .populate('author', 'name avatar bio')
+            .populate('category', 'name slug color')
+            .lean();
         
-        const data = await res.json();
-        return data.data;
+        if (!post) return null;
+        
+        // Increment view count in background (non-blocking)
+        BlogPost.updateOne({ _id: post._id }, { $inc: { viewCount: 1 } }).catch(() => {});
+        
+        // Serialize for JSON (convert ObjectId and Date)
+        return JSON.parse(JSON.stringify(post));
     } catch (error) {
         console.error("Failed to fetch post:", error);
         return null;
@@ -110,17 +117,21 @@ async function getRelatedPosts(categoryId, currentPostId) {
     if (!categoryId) return [];
     
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://negints.com";
-        const res = await fetch(
-            `${baseUrl}/api/blog/posts?category=${categoryId}&limit=3&status=published`,
-            { next: { revalidate: 60 } }
-        );
+        await dbConnect();
+        const posts = await BlogPost.find({
+            category: categoryId,
+            status: 'published',
+            _id: { $ne: currentPostId },
+        })
+            .populate('author', 'name avatar')
+            .populate('category', 'name slug color')
+            .sort({ publishedAt: -1 })
+            .limit(3)
+            .lean();
         
-        if (!res.ok) return [];
-        
-        const data = await res.json();
-        return (data.data || []).filter((p) => p._id !== currentPostId);
+        return JSON.parse(JSON.stringify(posts));
     } catch (error) {
+        console.error("Failed to fetch related posts:", error);
         return [];
     }
 }

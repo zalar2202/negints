@@ -1,6 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar, Clock, ChevronLeft, Tag } from "lucide-react";
+import dbConnect from "@/lib/mongodb";
+import BlogPost from "@/models/BlogPost";
+import BlogCategory from "@/models/BlogCategory";
 
 export const metadata = {
     title: "وبلاگ تخصصی | نگین تجهیز سپهر",
@@ -31,36 +34,29 @@ export const metadata = {
 
 async function getPosts() {
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const res = await fetch(`${baseUrl}/api/blog/posts?limit=12&status=published`, {
-            next: { revalidate: 60 },
-        });
+        await dbConnect();
+        const posts = await BlogPost.find({ status: 'published' })
+            .populate('author', 'name avatar')
+            .populate('category', 'name slug color')
+            .sort({ isPinned: -1, publishedAt: -1 })
+            .limit(12)
+            .lean();
         
-        if (!res.ok) {
-            return { posts: [], categories: [] };
-        }
-        
-        const data = await res.json();
-        return { posts: data.data || [], pagination: data.pagination };
+        return { posts: JSON.parse(JSON.stringify(posts)) };
     } catch (error) {
         console.error("Failed to fetch posts:", error);
-        return { posts: [], pagination: null };
+        return { posts: [] };
     }
 }
 
 async function getCategories() {
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const res = await fetch(`${baseUrl}/api/blog/categories`, {
-            next: { revalidate: 3600 },
-        });
+        await dbConnect();
+        const categories = await BlogCategory.find({ isActive: true })
+            .sort({ order: 1, name: 1 })
+            .lean();
         
-        if (!res.ok) {
-            return [];
-        }
-        
-        const data = await res.json();
-        return data.data || [];
+        return JSON.parse(JSON.stringify(categories));
     } catch (error) {
         console.error("Failed to fetch categories:", error);
         return [];

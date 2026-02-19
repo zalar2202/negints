@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar, Clock, ChevronRight, Tag } from "lucide-react";
+import dbConnect from "@/lib/mongodb";
+import BlogPost from "@/models/BlogPost";
 
 export async function generateMetadata({ params }) {
     const { tag } = await params;
@@ -22,15 +24,19 @@ export async function generateMetadata({ params }) {
 
 async function getPostsByTag(tag) {
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const res = await fetch(
-            `${baseUrl}/api/blog/posts?tag=${tag}&status=published&limit=12`,
-            { next: { revalidate: 60 } }
-        );
+        await dbConnect();
+        const decodedTag = decodeURIComponent(tag);
+        const posts = await BlogPost.find({
+            tags: decodedTag,
+            status: 'published',
+        })
+            .populate('author', 'name avatar')
+            .populate('category', 'name slug color')
+            .sort({ publishedAt: -1 })
+            .limit(12)
+            .lean();
         
-        if (!res.ok) return [];
-        const data = await res.json();
-        return data.data || [];
+        return JSON.parse(JSON.stringify(posts));
     } catch (error) {
         return [];
     }

@@ -2,6 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Calendar, Clock, ChevronRight, Hash } from "lucide-react";
+import dbConnect from "@/lib/mongodb";
+import BlogPost from "@/models/BlogPost";
+import BlogCategory from "@/models/BlogCategory";
 
 export async function generateMetadata({ params }) {
     const { slug } = await params;
@@ -29,14 +32,11 @@ export async function generateMetadata({ params }) {
 
 async function getCategory(slug) {
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const res = await fetch(`${baseUrl}/api/blog/categories/${slug}`, {
-            next: { revalidate: 3600 },
-        });
-        
-        if (!res.ok) return null;
-        const data = await res.json();
-        return data.data;
+        await dbConnect();
+        const decodedSlug = decodeURIComponent(slug);
+        const category = await BlogCategory.findOne({ slug: decodedSlug, isActive: true }).lean();
+        if (!category) return null;
+        return JSON.parse(JSON.stringify(category));
     } catch (error) {
         return null;
     }
@@ -44,15 +44,18 @@ async function getCategory(slug) {
 
 async function getPostsByCategory(categoryId) {
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const res = await fetch(
-            `${baseUrl}/api/blog/posts?category=${categoryId}&status=published&limit=12`,
-            { next: { revalidate: 60 } }
-        );
+        await dbConnect();
+        const posts = await BlogPost.find({
+            category: categoryId,
+            status: 'published',
+        })
+            .populate('author', 'name avatar')
+            .populate('category', 'name slug color')
+            .sort({ publishedAt: -1 })
+            .limit(12)
+            .lean();
         
-        if (!res.ok) return [];
-        const data = await res.json();
-        return data.data || [];
+        return JSON.parse(JSON.stringify(posts));
     } catch (error) {
         return [];
     }
