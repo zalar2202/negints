@@ -14,7 +14,7 @@ export const metadata = {
     title: "نگین تجهیز سپهر (NeginTS) - راهکارهای نوین تجهیزات پزشکی",
     description: "نگین تجهیز سپهر پیشرو در ارائه تجهیزات پزشکی تخصصی، کیت‌های کمک‌های اولیه و خدمات مهندسی پزشکی در ایران.",
     openGraph: {
-        title: "نوین طب سازه (NeginTS)",
+        title: "نگین تجهیز سپهر (NeginTS)",
         description: "تجهیزات تخصصی پزشکی و مهندسی پزشکی.",
         type: "website",
         images: [
@@ -28,7 +28,7 @@ export const metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "نوین طب سازه (NeginTS)",
+        title: "نگین تجهیز سپهر (NeginTS)",
         description: "ارائه دهنده تجهیزات نوین پزشکی و مهندسی.",
         images: ["/assets/logo/negints-logo.png"],
     },
