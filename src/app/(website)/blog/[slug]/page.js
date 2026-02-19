@@ -87,8 +87,10 @@ export async function generateMetadata({ params }) {
 
 async function getPost(slug) {
     try {
+        // Remove trailing slash if present
+        const cleanSlug = slug.endsWith('/') ? slug.slice(0, -1) : slug;
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const res = await fetch(`${baseUrl}/api/blog/posts/${encodeURIComponent(slug)}?t=${Date.now()}`, {
+        const res = await fetch(`${baseUrl}/api/blog/posts/${encodeURIComponent(cleanSlug)}?t=${Date.now()}`, {
             cache: "no-store",
         });
         
@@ -165,11 +167,22 @@ export default async function BlogPostPage({ params }) {
         post._id
     );
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://negints.com";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://negints.ir";
     const postUrl = `${baseUrl}/blog/${post.slug}`;
+    
+    // Use relative path for current origin, absolute for schema/metadata
+    const getSafeImageUrl = (url) => {
+        if (!url) return `${baseUrl}/assets/logo/negints-logo.png`;
+        if (url.startsWith('http')) return url;
+        const path = url.startsWith('/') ? url : `/${url}`;
+        return path; // Relative path for the component itself
+    };
+
     const imageUrl = post.featuredImage?.url 
         ? (post.featuredImage.url.startsWith('http') ? post.featuredImage.url : `${baseUrl}${post.featuredImage.url.startsWith('/') ? '' : '/'}${post.featuredImage.url}`)
         : `${baseUrl}/assets/logo/negints-logo.png`;
+
+    const displayImageUrl = getSafeImageUrl(post.featuredImage?.url);
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -276,7 +289,7 @@ export default async function BlogPostPage({ params }) {
                     <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
                         <Image
                             key={`${post._id}-${post.slug}`}
-                            src={post.featuredImage.url}
+                            src={displayImageUrl}
                             alt={post.featuredImage.alt || post.title}
                             fill
                             className="object-cover"
