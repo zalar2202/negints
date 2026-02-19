@@ -1,6 +1,6 @@
 {
-    "name": "NeginTS",
-    "short_name": "NeginTS",
+    "name": "نگین تجهیز سپهر",
+    "short_name": "نگین تجهیز",
     "icons": [
         {
             "src": "/assets/favicon/android-chrome-512x512.png",
@@ -8,7 +8,7 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
+    "theme_color": "#1a7a6d",
     "background_color": "#ffffff",
     "display": "standalone"
 }
