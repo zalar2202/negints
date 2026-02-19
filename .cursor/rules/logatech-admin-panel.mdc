@@ -1,0 +1,686 @@
+---
+alwaysApply: true
+---
+
+# LogaTech Project - Cursor AI Rules
+
+## Project Overview
+This repository contains **two distinct applications** under one Next.js app:
+
+1. **Website** — Public marketing site for LogaTech (digital studio / web agency). Landing pages, service pages (Design, Develop, Deploy, Maintain), and marketing content. Uses its own layout, styles (`website.css`), and components under `src/components/website/`. No auth, no Redux/Formik — mostly Server Components and static content with scroll animations.
+
+2. **Admin Panel** — Protected dashboard for internal use. Built with Next.js 16 (App Router), React 19, Tailwind CSS v4, Formik, Yup, Axios, and Redux Toolkit. Features include dark mode, hybrid state management, JWT auth, data tables, and comprehensive UI components.
+
+**Route structure:** Public site lives under `(website)`; admin under `panel`. Auth (login) is in `(auth)`.
+
+## Tech Stack
+- **Framework:** Next.js 16.0.1 (App Router)
+- **UI Library:** React 19.2.0
+- **Styling:** Tailwind CSS v4 + CSS Custom Properties (pure CSS approach)
+- **State Management:** Redux Toolkit + React Context (hybrid approach)
+- **Form Management:** Formik with Yup validation
+- **HTTP Client:** Axios
+- **Notifications:** Sonner (modern toast notifications)
+- **Icons:** Lucide React (1000+ tree-shakeable icons)
+- **Linting:** ESLint 9 (flat config) + Prettier
+- **Optimization:** React Compiler enabled
+
+## Code Style & Conventions
+
+### General
+- Use functional components with hooks (no class components)
+- Prefer named exports for components, utilities, and services
+- Use arrow functions for component definitions
+- Keep components small and focused (single responsibility)
+- Use meaningful, descriptive names (avoid abbreviations unless standard)
+
+### File Naming
+- Components: PascalCase (e.g., `UserTable.js`, `DashboardLayout.js`)
+- Utilities/Hooks: camelCase (e.g., `useAuth.js`, `formatDate.js`)
+- API routes: lowercase with hyphens (e.g., `api/user-management/route.js`)
+- Page files: lowercase (e.g., `page.js`, `layout.js`, `loading.js`, `error.js`)
+
+### Component Structure
+- Organize components in feature-based folders under `src/components/`
+- Keep page components minimal - delegate logic to feature components
+- Structure: imports → constants → component → exports
+- Co-locate related files (Component.js, Component.module.css if needed)
+
+### Component Imports (CRITICAL)
+
+**⚠️ IMPORTANT: Import pattern depends on which part of the app you're in.**
+
+**Admin Panel components** (`src/components/common/`, `forms/`, `tables/`, `layout/`) use **NAMED exports**. Import with curly braces:
+
+```javascript
+// ✅ CORRECT - Admin panel (named imports)
+import { Button } from '@/components/common/Button';
+import { Card } from '@/components/common/Card';
+import { InputField } from '@/components/forms/InputField';
+import { Table, TableHeader, TableRow, TableCell } from '@/components/tables';
+
+// ❌ WRONG - Admin panel (default import will fail)
+import Button from '@/components/common/Button';
+```
+
+**Website components** (`src/components/website/`) use **default exports**. Import without curly braces:
+
+```javascript
+// ✅ CORRECT - Website (default imports)
+import Hero from '@/components/website/homepage/Hero';
+import WebsiteHeader from '@/components/website/layout/WebsiteHeader';
+import WebsiteFooter from '@/components/website/layout/WebsiteFooter';
+import TechStack from '@/components/website/shared/TechStack';
+```
+
+**Exception (always default):** Page components and external libraries:
+```javascript
+export default function UsersPage() { ... }  // Page components
+import Link from 'next/link';                // Next.js components
+import Image from 'next/image';              // Next.js components
+```
+
+**Quick Reference - Import Patterns:**
+- **Website components** (`src/components/website/`): Default exports `import Component from '...'`
+- **Common components** (`src/components/common/`): Named exports `{ Component }`
+- **Form components** (`src/components/forms/`): Named exports `{ Component }`
+- **Table components** (`src/components/tables/`): Named exports `{ Component }`
+- **Layout components** (`src/components/layout/`): Named exports `{ Component }`
+- **Services** (`src/services/`): Named exports `{ serviceName }`
+- **Utilities** (`src/lib/`, `src/hooks/`): Named exports `{ utilityName }` (e.g. `useScrollAnimation`)
+- **Schemas** (`src/schemas/`): Named exports `{ schemaName }`
+- **Redux slices** (`src/features/`): Named exports for actions/selectors, default for reducer
+- **Page components** (`src/app/`): Default exports
+- **External libraries**: Follow library's export pattern (check docs)
+
+### Table Components Usage (CRITICAL)
+
+**⚠️ IMPORTANT: Use the correct table component for each purpose!**
+
+Our table components have specific roles:
+
+```javascript
+// ✅ CORRECT Table Structure
+import { Table, TableHeader, TableHeaderCell, TableRow, TableCell, TableActions } from '@/components/tables';
+
+<Table>
+    <TableHeader>                    {/* Renders <thead> wrapper */}
+        <TableRow>                   {/* Renders <tr> inside thead */}
+            <TableHeaderCell>Name</TableHeaderCell>         {/* Renders <th> */}
+            <TableHeaderCell>Email</TableHeaderCell>        {/* Renders <th> */}
+            <TableHeaderCell align="right">Actions</TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <tbody>                          {/* Manual <tbody> wrapper */}
+        {data.map((item) => (
+            <TableRow key={item.id}>  {/* Renders <tr> inside tbody */}
+                <TableCell>{item.name}</TableCell>          {/* Renders <td> */}
+                <TableCell>{item.email}</TableCell>         {/* Renders <td> */}
+                <TableCell align="right">
+                    <TableActions 
+                        onView={...} 
+                        onEdit={...} 
+                        onDelete={...} 
+                    />
+                </TableCell>
+            </TableRow>
+        ))}
+    </tbody>
+</Table>
+
+// ❌ WRONG - Don't use TableHeader for individual columns
+<Table>
+    <thead>
+        <TableRow>
+            <TableHeader>Name</TableHeader>  {/* This renders <thead>, not <th>! */}
+        </TableRow>
+    </thead>
+</Table>
+
+// ❌ WRONG - Don't manually add <thead> when using TableHeader
+<Table>
+    <thead>                          {/* Double <thead> nesting! */}
+        <TableHeader>                {/* This also renders <thead> */}
+            <TableRow>...</TableRow>
+        </TableHeader>
+    </thead>
+</Table>
+```
+
+**Component Reference:**
+- `Table` - Wraps the entire table with responsive container
+- `TableHeader` - Renders `<thead>` wrapper for header section
+- `TableHeaderCell` - Renders `<th>` for individual column headers (supports sorting)
+- `TableRow` - Renders `<tr>` for table rows
+- `TableCell` - Renders `<td>` for table data cells
+- `TableActions` - Pre-built action buttons (view, edit, delete)
+
+### React Best Practices
+- Avoid unnecessary useEffect - leverage React Compiler optimizations
+- Use Server Components by default, add 'use client' only when needed
+- Client Components required for: Redux, Context, event handlers, browser APIs
+- Implement proper error boundaries (error.js files) for resilient UX
+- Use Suspense boundaries (loading.js files) for async operations
+- Avoid prop drilling - use Redux for data, Context for simple global state
+
+### Next.js 16 Specific
+- **Route groups:** `(auth)` for login; `(website)` for public marketing pages (homepage, service pages); `panel` for protected admin dashboard (no route group parentheses).
+- Create loading.js files at each route level for loading states
+- Create error.js files at each route level for error boundaries
+- Use not-found.js for custom 404 pages
+- Use RouteGuard component instead of middleware for JWT auth in localStorage (panel only)
+- Server Components for initial data fetch, dispatch to Redux on client (panel)
+
+**Dynamic Route Parameters (CRITICAL):**
+- In Next.js 16 App Router, `params` are now **async** and must be **awaited**
+- This applies to both page components and API routes
+
+```javascript
+// ✅ CORRECT - Page components (await params)
+export default async function UserPage({ params }) {
+    const { id } = await params;  // Must await!
+    // ... rest of component
+}
+
+// ✅ CORRECT - API routes (await params)
+export async function GET(request, { params }) {
+    const { id } = await params;  // Must await!
+    // ... rest of handler
+}
+
+// ❌ WRONG - Not awaiting params (will cause errors)
+export async function GET(request, { params }) {
+    const { id } = params;  // Missing await!
+    // This will fail in Next.js 16
+}
+```
+
+**For Client Components:**
+Use the `use()` hook to unwrap params:
+```javascript
+'use client';
+import { use } from 'react';
+
+export default function EditPage({ params }) {
+    const unwrappedParams = use(params);
+    const { id } = unwrappedParams;
+    // ... rest of component
+}
+```
+
+### State Management (Hybrid Approach)
+
+**Use Redux Toolkit for:**
+- Business data (users, companies, transactions, packages, payments, promotions)
+- Complex UI state (filters, pagination, sorting)
+- Data that needs to be shared across many components
+- State that benefits from time-travel debugging
+
+**Use React Context for:**
+- Authentication state (AuthContext: user, token, login/logout)
+- Theme preference (ThemeContext: light/dark mode)
+- Simple global state that rarely changes
+
+**Other State:**
+- Keep form state local with Formik
+- Use URL state (searchParams) for shareable filters/pagination
+- Prefer Server Components for initial data fetching
+
+**Redux Guidelines:**
+- Use `createAsyncThunk` for all API calls
+- Use `createSlice` for feature state (one slice per feature)
+- Import pre-typed hooks: `useAppDispatch`, `useAppSelector`
+- Slices located in `src/features/[feature]/[feature]Slice.js`
+- All slices registered in `src/lib/store.js`
+
+### Forms with Formik & Yup
+- Always validate with Yup schemas
+- Create reusable field components (InputField, SelectField, etc.)
+- Handle loading and error states consistently
+- Use Formik's `touched` and `errors` for validation feedback
+- Implement proper form reset after successful submission
+
+### API Integration with Axios
+- Centralize Axios configuration in `src/lib/axios.js`
+- Create API service functions in `src/services/` organized by feature
+- Implement interceptors for auth tokens and error handling
+- Use proper error handling with try-catch blocks
+- Return consistent response structures from API functions
+- Handle loading and error states in UI components
+
+### Styling with Tailwind CSS v4 + Pure CSS
+
+**IMPORTANT: Tailwind CSS v4 is NOT compatible with SASS preprocessors. We use pure CSS only.**
+
+**Tailwind CSS v4:**
+- Follow mobile-first responsive design
+- Use Tailwind utility classes as primary styling method
+- Import in CSS files only: `@import "tailwindcss";`
+- Leverage Tailwind v4's native CSS features
+- Maintain consistent spacing scale (gap-4, p-6, etc.)
+
+**CSS Custom Properties (for theming):**
+- **ALWAYS use CSS variables for colors:** `var(--color-background)`, `var(--color-text-primary)`
+- **NEVER hard-code colors:** Avoid `#ffffff`, `#000000` in components
+- Primary and service colors from `src/styles/tokens.css` (shared with website); semantic/UI variables in `src/styles/panel.css`
+- Available variables: `--color-primary` (Persian Indigo #32127a from tokens), `--design-color`, `--develop-color`, `--deploy-color`, `--maintain-color`, `--color-success`, `--color-error`, `--color-background`, `--color-text-primary`, `--color-border`, etc.
+- This ensures automatic dark mode support
+
+**Dark Mode:**
+- All components automatically support dark mode via CSS variables
+- Theme toggled via `[data-theme="dark"]` attribute on `<html>`
+- Use ThemeContext and ThemeToggle component
+- System preference fallback via `@media (prefers-color-scheme: dark)`
+- Test all components in both light and dark modes
+
+**Note:** SASS files (`variables.scss`, `mixins.scss`) are kept for reference but NOT imported in global styles to avoid conflicts with Tailwind v4.
+
+### ESLint & Code Quality
+- Fix all ESLint errors before committing
+- Run `npm run lint:fix` to auto-fix issues
+- No console.logs in production code (use proper logging)
+- Remove unused imports and variables
+- Follow Next.js ESLint rules strictly
+
+### Admin Panel Specific
+
+**Authentication:**
+- JWT tokens stored in localStorage
+- AuthContext for auth state management
+- RouteGuard component for client-side route protection
+- Redirect to `/login` if not authenticated
+- Mock admin user: `admin@logatech.net` / `Admin@123`
+
+**Data Tables:**
+- Custom table components (Table, TableHeader, TableRow, TableCell)
+- Support sorting, filtering, pagination
+- Loading skeletons while fetching data
+- Empty states for no data scenarios
+
+**Forms:**
+- Formik + Yup for all forms
+- Reusable field components (InputField, SelectField, etc.)
+- Consistent validation and error display
+- Loading states on submit
+
+**Notifications:**
+- Use Sonner for toast notifications
+- Success/error/info toasts for user feedback
+- Import from `sonner` package
+
+**Navigation:**
+- Sidebar with collapsible menu
+- Active state indicators
+- Mobile-responsive (hamburger menu)
+- Icons from Lucide React
+
+**Dark Mode:**
+- ThemeToggle in Header component
+- All components support both themes via CSS variables
+- User preference persisted to localStorage
+
+### Website Specific
+
+**Purpose:** Public marketing site for LogaTech (From Code to Cloud). Tagline: *Design · Develop · Deploy · Maintain*.
+
+**Routes & layout:**
+- **Route group:** `src/app/(website)/` — all public pages
+- **Homepage:** `(homepage)/page.js` at `/`
+- **Service pages:** `services/design`, `services/develop`, `services/deploy`, `services/maintain`
+- **Layout:** `(website)/layout.js` imports `@/styles/website.css`, renders `WebsiteHeader`, `<main>{children}</main>`, `WebsiteFooter`. No sidebar or dashboard chrome.
+
+**Styling (website only):**
+- **Primary stylesheet:** `src/styles/website.css` — imports `tokens.css` for brand colors; theme variables (same semantic names as panel: `--color-primary`, `--color-background`, etc.), section classes, typography, tech stack section (Develop/Deploy pages), dark mode via `[data-theme="dark"]`. Homepage uses `--color-primary` (Persian Indigo); Design/Develop/Deploy/Maintain pages use `--design-color`, `--develop-color`, `--deploy-color`, `--maintain-color` via page classes. Imported only in the website layout.
+- Use CSS custom properties for colors (e.g. `var(--color-primary)`); no hard-coded hex in website components.
+- No Tailwind in website-specific CSS; use the classes and variables defined in `website.css`.
+
+**Components:**
+- **Location:** `src/components/website/` — all website-only components. **Default exports** (see Component Imports above).
+- **Structure:** `homepage/` (Hero, AboutSection, Services, WhyLoga, ProcessTimeline, FAQAccordion, CTASection), `layout/` (WebsiteHeader, WebsiteFooter, WebsiteThemeToggle), `design/`, `develop/`, `deploy/`, `maintain/` (service-specific sections), `shared/` (e.g. TechStack).
+- Reuse `WebsiteHeader` and `WebsiteFooter` on all website pages. Service pages compose section components (Hero, Who This Is For, Process, Deliverables, Pricing, FAQ, CTA, etc.) per `docs/WEBSITE/`.
+
+**Behavior & state:**
+- No Redux, Formik, or auth on website pages. Prefer Server Components where possible; add `'use client'` only for interactivity (e.g. theme toggle, accordions, scroll animations).
+- **Scroll animations:** Use `useScrollAnimation` from `@/hooks/useScrollAnimation` (named import) for reveal-on-scroll; many website sections use it. Same pattern: `const { ref, isVisible } = useScrollAnimation();` then attach `ref` and use `isVisible` for visibility classes.
+
+**Documentation:**
+- **Reference:** `docs/WEBSITE/` — Overview.md (company, services, tech stack), DesignLandingPage.md, DevelopLandingPage.md, DeployLandingPage.md, MaintainLandingPage.md (section-by-section specs, messaging, pricing guidance, FAQ, CTAs).
+- When adding or changing website copy or structure, follow the relevant doc (e.g. DesignLandingPage.md for `/services/design`).
+
+**Implementation notes:**
+- New website pages: add under `(website)/` (e.g. `(website)/about/page.js`). Use website layout and default-import website components.
+- New website section components: create under `src/components/website/[feature]/`, default export, use `website.css` variables and `useScrollAnimation` if needed. Match tone and structure from `docs/WEBSITE/`.
+
+### Performance
+- Leverage React Server Components for data fetching
+- Use Next.js Image component for all images
+- Implement pagination for large datasets
+- Use dynamic imports for heavy components
+- Optimize bundle size (check with `npm run build`)
+
+### Error Handling
+- Always handle API errors gracefully
+- Provide user-friendly error messages
+- Implement global error boundary
+- Log errors appropriately for debugging
+- Show fallback UI for failed components
+
+### Security
+- Never expose API keys or secrets in client code
+- Validate all user inputs (client and server side)
+- Implement CSRF protection for mutations
+- Sanitize data before rendering
+- Use environment variables for configuration
+
+### File Organization
+
+src/
+├── app/                        # Next.js App Router pages
+│   ├── (auth)/                # Auth route group (login, etc.)
+│   ├── (website)/             # Website route group (public marketing)
+│   │   ├── (homepage)/        # Homepage at /
+│   │   ├── layout.js          # Website layout (WebsiteHeader, main, WebsiteFooter) + website.css
+│   │   └── services/          # Service pages: design, develop, deploy, maintain
+│   ├── panel/                 # Admin panel (protected dashboard)
+│   ├── layout.js              # Root layout with providers
+│   ├── loading.js             # Root loading state
+│   ├── error.js               # Root error boundary
+│   ├── not-found.js           # Custom 404 page
+├── components/                 # Reusable UI components
+│   ├── website/               # Website-only components (default exports)
+│   │   ├── homepage/          # Hero, AboutSection, Services, WhyLoga, ProcessTimeline, FAQAccordion, CTASection
+│   │   ├── layout/            # WebsiteHeader, WebsiteFooter, WebsiteThemeToggle
+│   │   ├── design/            # Design service page sections
+│   │   ├── develop/           # Develop service page sections
+│   │   ├── deploy/            # Deploy service page sections
+│   │   ├── maintain/         # Maintain service page sections
+│   │   └── shared/            # Shared (e.g. TechStack)
+│   ├── common/                # Admin: Buttons, Cards, Loader, Skeleton, ThemeToggle, etc.
+│   ├── forms/                 # Admin: Form field components (Formik integrated)
+│   ├── tables/                # Admin: Table components (custom built)
+│   └── layout/                # Admin: Sidebar, Header, BottomNav, MainLayout, ContentWrapper
+├── features/                   # Redux slices (panel only, feature-based)
+│   ├── users/
+│   ├── companies/
+│   ├── transactions/
+│   ├── packages/
+│   ├── payments/
+│   └── promotions/
+├── services/                   # API service layer (panel)
+├── lib/                        # Utilities, helpers, configs
+├── contexts/                   # AuthContext, ThemeContext
+├── hooks/                      # useScrollAnimation (website), other custom hooks
+├── styles/                     # CSS for website + panel
+│   ├── tokens.css             # Shared design tokens: --color-primary (#32127a), --design-color, --develop-color, --deploy-color, --maintain-color (+ hovers). Imported by website.css and panel.css. Panel adopts website colors.
+│   ├── website.css            # Website theme + section styles + tech stack (imports tokens.css; imported in (website)/layout.js)
+│   ├── panel.css              # Panel: Tailwind v4 + CSS custom properties (imports tokens.css; imported in root layout.js)
+│   ├── variables.scss         # Reference only (NOT imported)
+│   └── mixins.scss            # Reference only (NOT imported)
+├── schemas/                    # Yup validation schemas (panel)
+└── constants/                  # App constants and configs
+
+
+### Comments & Documentation
+- Write self-documenting code (clear names > comments)
+- Add JSDoc comments for complex functions
+- Document non-obvious business logic
+- Keep comments concise and up-to-date
+- Add TODO comments for future improvements
+
+### Git Workflow
+- Write clear, descriptive commit messages
+- Keep commits focused and atomic
+- Test before committing
+- Run linter before pushing
+
+### Redux Toolkit Patterns
+- Use `createAsyncThunk` for all API calls
+- Use `createSlice` for state management
+- Follow the pattern in `src/features/users/usersSlice.js`
+- Each feature gets: list, loading, error, filters, pagination state
+- Thunks call service layer functions (e.g., `userService.getUsers()`)
+- Use `useAppDispatch` and `useAppSelector` hooks (not plain Redux hooks)
+
+### Server-Side Pagination Patterns (CRITICAL — Panel Only)
+
+**⚠️ IMPORTANT: All new panel list features (users, companies, etc.) MUST use server-side pagination for optimal performance. Website pages do not use this pattern.**
+
+#### Backend API Response Structure
+
+All paginated endpoints MUST return this exact structure:
+
+```javascript
+{
+  data: [...],                    // Array of actual items
+  links: {
+    next: "url?page=2&limit=10",  // Next page URL (null if last page)
+    prev: "url?page=1&limit=10"   // Previous page URL (null if first page)
+  },
+  meta: {
+    current_page: 1,              // Current page number
+    last_page: 10,                // Total pages available
+    total: 100                    // Total items count
+  }
+}
+```
+
+#### Redux Slice Pattern
+
+```javascript
+// Required state structure for all paginated features
+const initialState = {
+    list: [],
+    loading: false,
+    error: null,
+    pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        pages: 0,
+    },
+    links: {
+        next: null,
+        prev: null,
+    },
+    filters: {
+        search: "",
+        status: "all",
+        // ... feature-specific filters
+    },
+};
+
+// Handle API response in fetchItems.fulfilled
+.addCase(fetchItems.fulfilled, (state, action) => {
+    state.loading = false;
+    state.list = action.payload.data;
+    state.pagination.page = action.payload.meta.current_page;
+    state.pagination.pages = action.payload.meta.last_page;
+    state.pagination.total = action.payload.meta.total;
+    state.links.next = action.payload.links?.next || null;
+    state.links.prev = action.payload.links?.prev || null;
+})
+```
+
+#### URL State Management Pattern (CRITICAL - Avoid Circular Dependencies!)
+
+**⚠️ IMPORTANT: URL must be the SINGLE source of truth to prevent infinite loops!**
+
+```javascript
+// Required imports for pagination
+import { useRouter, useSearchParams } from "next/navigation";
+
+// Update URL without page refresh
+const updateUrl = useCallback((params) => {
+    const url = new URL(window.location);
+    
+    Object.entries(params).forEach(([key, value]) => {
+        if (value && value !== "all" && value !== "") {
+            url.searchParams.set(key, value);
+        } else {
+            url.searchParams.delete(key);
+        }
+    });
+
+    // Keep URLs clean (remove page=1)
+    if (url.searchParams.get("page") === "1") {
+        url.searchParams.delete("page");
+    }
+
+    router.push(url.pathname + url.search, { scroll: false });
+}, [router]);
+
+// Fetch data directly from URL (URL is the single source of truth)
+useEffect(() => {
+    // Get and validate URL parameters
+    let page = parseInt(searchParams.get("page")) || 1;
+    const search = searchParams.get("search") || "";
+    const status = searchParams.get("status") || "all";
+    
+    // Validate page number
+    if (page < 1) page = 1;
+    
+    // Validate filter values (customize per feature)
+    const validStatuses = ["all", "active", "inactive"];
+    const validatedStatus = validStatuses.includes(status) ? status : "all";
+    
+    // Sync Redux state with URL (for UI display only)
+    dispatch(setPage(page));
+    dispatch(setFilters({ search, status: validatedStatus }));
+    
+    // Fetch data with URL parameters directly
+    dispatch(fetchItems({
+        page,
+        limit: 10,
+        search,
+        status: validatedStatus,
+    }));
+}, [searchParams, dispatch]); // Only depend on searchParams and dispatch
+```
+
+#### Component Integration Pattern
+
+```javascript
+// Page change handler - reads current state from URL
+const handlePageChange = (newPage) => {
+    const currentSearch = searchParams.get("search") || "";
+    const currentStatus = searchParams.get("status") || "all";
+    
+    updateUrl({
+        page: newPage,
+        search: currentSearch,
+        status: currentStatus,
+    });
+    
+    // Smooth scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+// Filter change handler - reads current state from URL
+const handleFilterChange = (filterName, value) => {
+    const currentSearch = searchParams.get("search") || "";
+    const currentStatus = searchParams.get("status") || "all";
+    
+    const newParams = {
+        page: 1, // Reset to first page when filters change
+        search: currentSearch,
+        status: currentStatus,
+    };
+    
+    // Update the changed filter
+    newParams[filterName] = value;
+    
+    updateUrl(newParams);
+};
+
+// Debounced search handler (optional)
+useEffect(() => {
+    const currentSearch = searchParams.get("search") || "";
+    
+    // Only update if different from URL
+    if (searchTerm === currentSearch) return;
+    
+    const delayDebounce = setTimeout(() => {
+        const currentStatus = searchParams.get("status") || "all";
+        updateUrl({
+            page: 1,
+            search: searchTerm,
+            status: currentStatus,
+        });
+    }, 500);
+    
+    return () => clearTimeout(delayDebounce);
+}, [searchTerm, searchParams, updateUrl]);
+
+// Pagination component usage
+<Pagination
+    currentPage={pagination.page}
+    totalPages={pagination.pages}
+    onPageChange={handlePageChange}
+    totalItems={pagination.total}
+    itemsPerPage={pagination.limit}
+/>
+```
+
+#### Implementation Checklist
+
+When implementing pagination for any new feature:
+
+**Backend (API Route):**
+- [ ] Accept `page`, `limit`, `search`, and feature-specific filter parameters
+- [ ] Return standardized `{ data, links, meta }` response structure
+- [ ] Calculate `current_page`, `last_page`, `total` correctly
+- [ ] Generate `next`/`prev` URLs with proper parameters
+
+**Redux Slice:**
+- [ ] Add `pagination`, `links`, and `filters` to initial state
+- [ ] Handle `fetchItems.fulfilled` to extract `data`, `links`, `meta`
+- [ ] Create `setFilters` and `setPage` reducers
+
+**Component (List Page — panel only):**
+- [ ] Import `useSearchParams`, `useRouter` from Next.js
+- [ ] Implement `getUrlParams()` with feature-specific validation
+- [ ] Implement `updateUrl()` for URL state management
+- [ ] Create `handlePageChange()` and `handleFilterChange()` handlers
+- [ ] Add URL sync effect with `useEffect(() => {}, [searchParams])`
+- [ ] Add smooth scroll behavior on page changes
+
+**URL Structure:**
+- [ ] Base: `/feature` (page 1, no filters)
+- [ ] Paginated: `/feature?page=2`
+- [ ] Filtered: `/feature?page=1&search=term&status=active`
+
+#### Reference Implementation
+
+- **Complete Example:** User Management (`src/app/panel/users/page.js`)
+- **API Route:** `src/app/api/users/route.js`
+- **Redux Slice:** `src/features/users/usersSlice.js`
+- **Service:** `src/services/user.service.js`
+
+#### Documentation
+
+- **Full Guide:** `docs/PANEL/guides/PAGINATION_PATTERNS.md`
+- **Implementation Plan:** `docs/PANEL/guides/IMPLEMENTATION_PLAN.md` (Server-Side Pagination section)
+
+### Component Patterns
+- **Server Components:** Default for pages, static content
+- **Client Components ('use client'):** Required for Redux, Context, interactivity
+- **Providers order:** ThemeProvider → AuthProvider → StoreProvider → App content
+- **Loading states:** Use Skeleton components, not just spinners
+- **Error states:** User-friendly messages with recovery options
+
+## AI Assistant Guidelines
+- **Context:** Determine whether the user is working on the **website** (public pages under `(website)`) or the **admin panel** (under `panel`). Apply the right conventions: website = default-import components, `website.css`, no Redux/Formik, `docs/WEBSITE/`; panel = named-import components, Redux, Formik, pagination patterns, `panel.css`/Tailwind.
+- Suggest modern, performant solutions
+- Prioritize readability and maintainability
+- Follow the established patterns in the codebase
+- **ALWAYS use CSS custom properties for colors (never hard-code)** — in both website and panel.
+- **Website:** Use default exports for `src/components/website/`; follow `docs/WEBSITE/` (Overview, DesignLandingPage, DevelopLandingPage, etc.) for copy and structure; use `useScrollAnimation` for reveal-on-scroll where appropriate.
+- **Panel:** Use Redux for business data, Context for auth/theme only; named exports for panel components; server-side pagination for new list features; reference User Management as the template.
+- **ALWAYS implement server-side pagination for new panel features** using the standardized patterns (not for website pages).
+- **Ensure URL state management is included** for panel list pages (bookmarkable/shareable URLs).
+- **Follow the exact `{ data, links, meta }` response structure** for panel API consistency.
+- Ask for clarification when requirements are ambiguous
+- Provide explanations for non-trivial code
+- Consider accessibility in UI components
+- Suggest improvements proactively but respect user decisions
+- **Documentation:** Website → `docs/WEBSITE/`. Panel → `docs/PANEL/README.md` (overview); setup, auth, notifications, ui, guides in `docs/PANEL/` subfolders (e.g. IMPLEMENTATION_PLAN.md, PAGINATION_PATTERNS.md, REDUX_GUIDE.md, DARK_MODE.md in guides/ and ui/).

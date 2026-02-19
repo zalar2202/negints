@@ -1,0 +1,52 @@
+/* ===================================
+   NeginTS Design Tokens (Shared)
+   Website + Panel use these colors.
+   Professional, innovative medical theme.
+   =================================== */
+
+:root {
+    /* Primary Branding - Deep Professional Navy */
+    --color-primary: #0a3d62;
+    --color-primary-hover: #072d4a;
+
+    /* Secondary / Accent - Innovative Medical Blue */
+    --color-secondary: #3c6382;
+    --color-accent: #38ada9;
+    --color-accent-hover: #079992;
+
+    /* Service-specific colors (Mapped to Medical Divisions) */
+    --kit-color: #0c2461;
+    --instrument-color: #1e3799;
+    --healthcare-color: #4a69bd;
+    --pharma-color: #6a89cc;
+
+    /* Premium Gradients */
+    --gradient-medical: linear-gradient(135deg, #0a3d62 0%, #3c6382 100%);
+    --gradient-innovative: linear-gradient(135deg, #38ada9 0%, #079992 100%);
+    --gradient-surface: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+}
+
+
+/* Dark mode: Vibrant and clear */
+[data-theme="dark"] {
+    --color-primary: #60a5fa;
+    --color-primary-hover: #93c5fd;
+    --color-accent: #4fd1c5;
+    --color-accent-hover: #81e6d9;
+
+    --kit-color: #82ccdd;
+    --instrument-color: #60a3bc;
+    --healthcare-color: #3c6382;
+    --pharma-color: #0a3d62;
+}
+
+/* System preference fallback */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --color-primary: #60a5fa;
+        --color-primary-hover: #93c5fd;
+        --color-accent: #4fd1c5;
+        --color-accent-hover: #81e6d9;
+    }
+}
+
