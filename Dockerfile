@@ -57,6 +57,7 @@ RUN adduser --system --uid 1001 nextjs
 
 # Copy essential files for standalone execution
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
