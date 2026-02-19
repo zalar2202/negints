@@ -2,7 +2,7 @@ import BlogPost from '@/models/BlogPost';
 import dbConnect from '@/lib/mongodb';
 
 export default async function sitemap() {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://negints.com';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://negints.ir';
 
     // Static pages
     const routes = [
