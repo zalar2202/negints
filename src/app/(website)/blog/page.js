@@ -5,6 +5,8 @@ import dbConnect from "@/lib/mongodb";
 import BlogPost from "@/models/BlogPost";
 import BlogCategory from "@/models/BlogCategory";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
     title: "وبلاگ تخصصی | نگین تجهیز سپهر",
     description: "آخرین مقالات، آموزش‌ها و تازه‌های دنیای تجهیزات پزشکی و مهندسی پزشکی را در وبلاگ نگین تجهیز سپهر دنبال کنید.",
@@ -72,7 +74,21 @@ function formatDate(dateString) {
     });
 }
 
+function normalizeImageUrl(url) {
+    if (!url) return null;
+    if (url.startsWith('http')) {
+        try {
+            const parsed = new URL(url);
+            return parsed.pathname + parsed.search;
+        } catch {
+            return url;
+        }
+    }
+    return url.startsWith('/') ? url : `/${url}`;
+}
+
 function PostCard({ post, featured = false }) {
+    const imgUrl = normalizeImageUrl(post.featuredImage?.url);
     return (
         <Link
             href={`/blog/${post.slug}`}
@@ -86,9 +102,9 @@ function PostCard({ post, featured = false }) {
                     featured ? "h-64 md:h-80" : "h-48"
                 }`}
             >
-                {post.featuredImage?.url ? (
+                {imgUrl ? (
                     <Image
-                        src={post.featuredImage.url}
+                        src={imgUrl}
                         alt={post.featuredImage.alt || post.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -163,7 +179,7 @@ function PostCard({ post, featured = false }) {
 }
 
 export default async function BlogPage() {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://negints.com";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://negints.ir";
     const [{ posts, pagination }, categories] = await Promise.all([
         getPosts(),
         getCategories(),

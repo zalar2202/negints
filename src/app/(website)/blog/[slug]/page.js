@@ -181,19 +181,27 @@ export default async function BlogPostPage({ params }) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://negints.ir";
     const postUrl = `${baseUrl}/blog/${post.slug}`;
     
-    // Use relative path for current origin, absolute for schema/metadata
-    const getSafeImageUrl = (url) => {
-        if (!url) return `${baseUrl}/assets/logo/negints-logo.png`;
-        if (url.startsWith('http')) return url;
-        const path = url.startsWith('/') ? url : `/${url}`;
-        return path; // Relative path for the component itself
+    // Normalize image URLs: strip domain to make relative, so Next.js Image works correctly
+    const normalizeImageUrl = (url) => {
+        if (!url) return null;
+        // If it's an absolute URL, extract just the path
+        if (url.startsWith('http')) {
+            try {
+                const parsed = new URL(url);
+                return parsed.pathname + parsed.search;
+            } catch {
+                return url;
+            }
+        }
+        return url.startsWith('/') ? url : `/${url}`;
     };
 
+    const displayImageUrl = normalizeImageUrl(post.featuredImage?.url);
+    
+    // For metadata/schema (needs full absolute URL)
     const imageUrl = post.featuredImage?.url 
-        ? (post.featuredImage.url.startsWith('http') ? post.featuredImage.url : `${baseUrl}${post.featuredImage.url.startsWith('/') ? '' : '/'}${post.featuredImage.url}`)
+        ? `${baseUrl}${normalizeImageUrl(post.featuredImage.url)}`
         : `${baseUrl}/assets/logo/negints-logo.png`;
-
-    const displayImageUrl = getSafeImageUrl(post.featuredImage?.url);
 
     const jsonLd = {
         "@context": "https://schema.org",
