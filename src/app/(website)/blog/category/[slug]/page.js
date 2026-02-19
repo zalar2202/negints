@@ -6,6 +6,8 @@ import dbConnect from "@/lib/mongodb";
 import BlogPost from "@/models/BlogPost";
 import BlogCategory from "@/models/BlogCategory";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }) {
     const { slug } = await params;
     const category = await getCategory(slug);
@@ -70,20 +72,33 @@ function formatDate(dateString) {
     });
 }
 
+function normalizeImageUrl(url) {
+    if (!url) return null;
+    if (url.startsWith('http')) {
+        try {
+            const parsed = new URL(url);
+            return parsed.pathname + parsed.search;
+        } catch {
+            return url;
+        }
+    }
+    return url.startsWith('/') ? url : `/${url}`;
+}
+
 function PostCard({ post }) {
+    const imgUrl = normalizeImageUrl(post.featuredImage?.url);
     return (
         <Link
             href={`/blog/${post.slug}`}
             className="group block overflow-hidden rounded-2xl bg-[var(--card-bg)] border border-[var(--border-color)] hover:border-[var(--accent-color)] transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
         >
             <div className="relative h-48 overflow-hidden">
-                {post.featuredImage?.url ? (
-                    <Image
-                        src={post.featuredImage.url}
+                {imgUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                        src={imgUrl}
                         alt={post.featuredImage.alt || post.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-br from-[var(--accent-color)] to-purple-600 flex items-center justify-center">

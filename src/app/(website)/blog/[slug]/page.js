@@ -304,16 +304,15 @@ export default async function BlogPostPage({ params }) {
             {/* Hero Section */}
             <section className="relative">
                 {/* Featured Image */}
-                {post.featuredImage?.url ? (
+                {displayImageUrl ? (
                     <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
-                        <Image
-                            key={`${post._id}-${post.slug}`}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
                             src={displayImageUrl}
-                            alt={post.featuredImage.alt || post.title}
-                            fill
-                            className="object-cover"
-                            priority
-                            sizes="100vw"
+                            alt={post.featuredImage?.alt || post.title}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            loading="eager"
+                            fetchPriority="high"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                     </div>
