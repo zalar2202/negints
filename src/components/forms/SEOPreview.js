@@ -68,7 +68,7 @@ export function SEOPreview({
     const getSlugScore = () => {
         if (!slug) return { score: 0, status: "error", message: "Slug is required" };
         if (slug.length > SEO_LIMITS.slug.max) return { score: 50, status: "warning", message: "Slug is too long" };
-        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return { score: 30, status: "error", message: "Invalid slug format" };
+        if (!/^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u.test(slug)) return { score: 30, status: "error", message: "Invalid slug format" };
         return { score: 100, status: "success", message: "Good URL structure" };
     };
 

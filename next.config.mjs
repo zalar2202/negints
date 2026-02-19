@@ -25,6 +25,10 @@ const nextConfig = {
                 hostname: 'negints.com',
             },
             {
+                protocol: 'https',
+                hostname: 'negints.ir',
+            },
+            {
                 protocol: 'http',
                 hostname: 'localhost',
             }
@@ -38,7 +42,7 @@ const nextConfig = {
             default-src 'self';
             script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com;
             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-            img-src 'self' blob: data: https://negints.com https://www.googletagmanager.com https://www.google-analytics.com;
+            img-src 'self' blob: data: https://negints.com https://negints.ir https://www.googletagmanager.com https://www.google-analytics.com;
             font-src 'self' data: https://fonts.gstatic.com;
             object-src 'none';
             base-uri 'self';

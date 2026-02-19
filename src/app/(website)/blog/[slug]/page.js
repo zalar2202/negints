@@ -87,8 +87,8 @@ export async function generateMetadata({ params }) {
 
 async function getPost(slug) {
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://negints.com";
-        const res = await fetch(`${baseUrl}/api/blog/posts/${slug}?t=${Date.now()}`, {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        const res = await fetch(`${baseUrl}/api/blog/posts/${encodeURIComponent(slug)}?t=${Date.now()}`, {
             cache: "no-store",
         });
         
