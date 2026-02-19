@@ -27,7 +27,8 @@ const BlogPostSchema = new mongoose.Schema(
             unique: true,
             lowercase: true,
             trim: true,
-            match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be URL-friendly'],
+            // Allow Unicode letters and numbers for Persian support
+            match: [/^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u, 'Slug must be URL-friendly'],
         },
         excerpt: {
             type: String,
@@ -189,7 +190,8 @@ BlogPostSchema.pre('save', function (next) {
 BlogPostSchema.statics.generateSlug = async function (title, existingId = null) {
     let slug = title
         .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
+        // Allow Unicode letters and numbers (Persian)
+        .replace(/[^\p{L}\p{N}\s-]/gu, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
         .trim();

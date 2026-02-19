@@ -85,7 +85,8 @@ export default function NewBlogPostPage() {
         if (!isSlugEdited && postData.title) {
             const slug = postData.title
                 .toLowerCase()
-                .replace(/[^a-z0-9\s-]/g, "")
+                // Support Unicode (Persian) in slug generation
+                .replace(/[^\p{L}\p{N}\s-]/gu, "")
                 .replace(/\s+/g, "-")
                 .replace(/-+/g, "-")
                 .trim();

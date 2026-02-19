@@ -95,7 +95,9 @@ BlogCategorySchema.virtual('children', {
 BlogCategorySchema.statics.generateSlug = async function (name, existingId = null) {
     let slug = name
         .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
+        // Replace non-word characters (including Persian) with space, then clean up
+        // Using Unicode property escapes (\p{L} for letters, \p{N} for numbers)
+        .replace(/[^\p{L}\p{N}\s-]/gu, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
         .trim();
