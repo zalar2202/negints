@@ -27,9 +27,14 @@ export async function POST(request) {
         // Zarinpal expects Toman. Our system uses IRT (Toman) as base currency now.
         const amount = invoice.total;
         
+        // Use https for production callback if possible
         const host = request.headers.get('host');
-        const protocol = request.headers.get('x-forwarded-proto') || 'http';
+        const protocol = host.includes('localhost') ? 'http' : 'https';
         const callbackUrl = `${protocol}://${host}/api/payments/zarinpal/verify?invoiceId=${invoiceId}`;
+
+        if (amount < 1000) {
+            return NextResponse.json({ error: 'مبلغ باید حداقل ۱۰۰۰ تومان باشد' }, { status: 400 });
+        }
 
         const result = await requestPayment({
             amount,

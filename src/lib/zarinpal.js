@@ -46,13 +46,15 @@ export async function requestPayment({ amount, description, callbackUrl, metadat
 
         const response = await axios.post(`${baseUrl}/request.json`, {
             merchant_id: config.merchantId,
-            amount: amount, // Zarinpal works with Toman in v4 standard
+            amount: Math.round(amount), // Ensure integer (Toman)
             description,
             callback_url: callbackUrl,
             metadata: {
                 mobile: metadata.mobile || '',
                 email: metadata.email || ''
             }
+        }, {
+            timeout: 10000 // 10 second timeout
         });
 
         if (response.data.data && response.data.data.code === 100) {
@@ -65,14 +67,15 @@ export async function requestPayment({ amount, description, callbackUrl, metadat
 
         return {
             success: false,
-            message: response.data.errors?.message || 'Zarinpal request failed',
+            message: response.data.errors?.message || `Zarinpal rejected request (Code: ${response.data.errors?.code || 'Unknown'})`,
             code: response.data.errors?.code
         };
     } catch (error) {
-        console.error('Zarinpal Request Error:', error.response?.data || error.message);
+        console.error('Zarinpal Request Error Details:', error.response?.data || error.message);
+        const errorMsg = error.response?.data?.errors?.message || error.message;
         return {
             success: false,
-            message: 'Internal error connecting to Zarinpal'
+            message: `Zarinpal Connection Error: ${errorMsg}`
         };
     }
 }
