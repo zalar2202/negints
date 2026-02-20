@@ -46,7 +46,7 @@ export async function requestPayment({ amount, description, callbackUrl, metadat
 
         const requestData = {
             merchant_id: config.merchantId,
-            amount: Math.round(amount), // Ensure integer (Toman)
+            amount: Math.round(amount * 10), // Convert Toman to Rial
             description,
             callback_url: callbackUrl,
         };

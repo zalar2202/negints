@@ -29,7 +29,7 @@ export default function SignupPage() {
         }
         setFieldValue("password", password);
         setFieldValue("confirmPassword", password);
-        toast.info("Secure password generated!");
+        toast.info("رمز عبور امن تولید شد!");
     };
 
     const handleSubmit = async (values, { setSubmitting }) => {
@@ -37,7 +37,7 @@ export default function SignupPage() {
         setCaptchaError("");
 
         if (!isCaptchaSolved) {
-            setCaptchaError("Please solve the security check correctly.");
+            setCaptchaError("لطفاً تست امنیتی را به درستی انجام دهید.");
             setSubmitting(false);
             return;
         }
@@ -50,15 +50,15 @@ export default function SignupPage() {
             });
 
             if (response.data.success) {
-                toast.success("Account created successfully! Welcome.");
+                toast.success("حساب کاربری با موفقیت ساخته شد! خوش آمدید.");
                 router.push("/panel/dashboard");
             } else {
-                setError(response.data.message || "Signup failed. Please try again.");
-                toast.error(response.data.message || "Signup failed");
+                setError(response.data.message || "ثبت‌نام ناموفق بود. لطفاً دوباره تلاش کنید.");
+                toast.error(response.data.message || "ثبت‌نام ناموفق");
             }
         } catch (err) {
             const message =
-                err.response?.data?.message || "An unexpected error occurred. Please try again.";
+                err.response?.data?.message || "یک خطای غیرمنتظره رخ داد. لطفاً دوباره تلاش کنید.";
             setError(message);
             toast.error(message);
         } finally {
@@ -67,14 +67,13 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="w-full max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+        <div className="w-full max-w-6xl mx-auto px-4 py-12 md:py-20">
+            <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-start">
                 {/* Left Side - Branding */}
-                <div className="hidden md:block">
-                    <div className="text-center md:text-left">
+                <div className="hidden md:block pt-12">
+                    <div className="text-right">
                         <div
-                            className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-6 overflow-hidden shadow-xl"
-                            style={{ backgroundColor: "var(--color-primary)" }}
+                            className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-8 overflow-hidden shadow-xl p-2 bg-[var(--color-background-elevated)] border border-[var(--color-border)] animate-fade-in"
                         >
                             <Image
                                 src="/assets/logo/negints-logo.png"
@@ -86,44 +85,50 @@ export default function SignupPage() {
                         </div>
 
                         <h1
-                            className="text-4xl font-bold mb-4"
-                            style={{ color: "var(--color-text-primary)" }}
+                            className="text-4xl lg:text-5xl font-black mb-6 leading-tight animate-fade-in-up"
+                            style={{ color: "var(--color-primary)" }}
                         >
-                            NeginTS User Panel
+                            پنل کاربری نگین تجهیز سپهر
                         </h1>
 
                         <p
-                            className="text-lg mb-8"
+                            className="text-xl mb-10 leading-relaxed font-medium animate-fade-in-up delay-100"
                             style={{ color: "var(--color-text-secondary)" }}
                         >
-                            Join our community and manage your business with ease.
+                            به جامعه ما بپیوندید و کسب‌وکار خود را با سهولت مدیریت کنید.
                         </p>
 
-                        <div className="space-y-4">
+                        <div className="space-y-8 animate-fade-in-up delay-200">
                             {[
-                                { icon: "🚀", title: "Join Today", desc: "Get started in seconds" },
-                                {
-                                    icon: "🛡️",
-                                    title: "Secure",
-                                    desc: "Your data is always protected",
+                                { 
+                                    icon: <Rocket className="text-[var(--color-primary)]" size={28} />, 
+                                    title: "همین امروز بپیوندید", 
+                                    desc: "شروع کار در عرض چند ثانیه" 
                                 },
                                 {
-                                    icon: "📱",
-                                    title: "Flexible",
-                                    desc: "Access from any device",
+                                    icon: <Shield className="text-[var(--color-primary)]" size={28} />,
+                                    title: "امنیت کامل",
+                                    desc: "داده‌های شما همیشه محافظت می‌شوند",
+                                },
+                                {
+                                    icon: <Database className="text-[var(--color-primary)]" size={28} />,
+                                    title: "انعطاف‌پذیری",
+                                    desc: "دسترسی از هر دستگاهی",
                                 },
                             ].map((feature, index) => (
-                                <div key={index} className="flex items-center gap-3">
-                                    <span className="text-3xl">{feature.icon}</span>
-                                    <div>
+                                <div key={index} className="flex items-start gap-5 group">
+                                    <div className="w-14 h-14 rounded-2xl bg-[var(--color-background-elevated)] flex-shrink-0 flex items-center justify-center border border-[var(--color-border)] group-hover:border-[var(--color-primary)] group-hover:shadow-md transition-all duration-300">
+                                        {feature.icon}
+                                    </div>
+                                    <div className="pt-1">
                                         <p
-                                            className="font-semibold"
+                                            className="font-bold text-xl mb-1"
                                             style={{ color: "var(--color-text-primary)" }}
                                         >
                                             {feature.title}
                                         </p>
                                         <p
-                                            className="text-sm"
+                                            className="text-base"
                                             style={{ color: "var(--color-text-secondary)" }}
                                         >
                                             {feature.desc}
@@ -136,36 +141,36 @@ export default function SignupPage() {
                 </div>
 
                 {/* Right Side - Signup Form */}
-                <Card className="w-full relative">
+                <Card className="w-full relative overflow-hidden">
                     <div className="p-8">
                         {/* Homepage Button */}
                         <Link
                             href="/"
-                            className="absolute top-4 right-6 flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
+                            className="absolute top-6 left-8 flex items-center gap-1 text-sm font-bold transition-colors hover:opacity-80"
                             style={{ color: "var(--color-primary)" }}
                         >
-                            <ArrowLeft size={16} />
-                            Homepage
+                            بازگشت به سایت
+                            <ArrowRight size={18} />
                         </Link>
                         {/* Mobile Logo */}
-                        <div className="md:hidden text-center mb-6">
+                        <div className="md:hidden text-center mb-8 pt-4">
                             <div
-                                className="inline-flex items-center justify-center w-16 h-16 rounded-xl mb-4 overflow-hidden shadow-lg mx-auto"
-                                style={{ backgroundColor: "var(--color-primary)" }}
+                                className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 overflow-hidden shadow-lg mx-auto p-2"
+                                style={{ backgroundColor: "var(--color-background-elevated)" }}
                             >
                                 <Image
                                     src="/assets/logo/negints-logo.png"
                                     alt="NeginTS"
-                                    width={48}
-                                    height={48}
-                                    className="w-12 h-12 object-contain"
+                                    width={64}
+                                    height={64}
+                                    className="w-16 h-16 object-contain"
                                 />
                             </div>
                             <h2
                                 className="text-2xl font-bold"
-                                style={{ color: "var(--color-text-primary)" }}
+                                style={{ color: "var(--color-primary)" }}
                             >
-                                NeginTS
+                                مدیریت نگین تجهیز سپهر
                             </h2>
                         </div>
 
@@ -173,23 +178,23 @@ export default function SignupPage() {
                             className="text-2xl font-bold mb-2 hidden md:block"
                             style={{ color: "var(--color-text-primary)" }}
                         >
-                            Create Account
+                            ساخت حساب کاربری
                         </h2>
 
                         <p
-                            className="mb-6 hidden md:block"
+                            className="mb-8 hidden md:block font-medium"
                             style={{ color: "var(--color-text-secondary)" }}
                         >
-                            Get started with your new account
+                            با حساب کاربری جدید خود شروع کنید
                         </p>
 
                         {/* Error Message */}
                         {error && (
                             <div
-                                className="mb-6 p-4 rounded-lg flex items-start gap-3"
+                                className="mb-8 p-4 rounded-xl flex items-start gap-3"
                                 style={{
-                                    backgroundColor: "var(--color-error-light)",
-                                    borderLeft: "4px solid var(--color-error)",
+                                    backgroundColor: "rgba(220, 38, 38, 0.1)",
+                                    borderRight: "4px solid var(--color-error)",
                                 }}
                             >
                                 <AlertCircle
@@ -197,7 +202,7 @@ export default function SignupPage() {
                                     style={{ color: "var(--color-error)" }}
                                     className="flex-shrink-0 mt-0.5"
                                 />
-                                <p className="text-sm" style={{ color: "var(--color-error)" }}>
+                                <p className="text-sm font-bold" style={{ color: "var(--color-error)" }}>
                                     {error}
                                 </p>
                             </div>
@@ -209,19 +214,19 @@ export default function SignupPage() {
                             onSubmit={handleSubmit}
                         >
                             {({ isSubmitting, setFieldValue }) => (
-                                <Form className="space-y-4">
+                                <Form className="space-y-5">
                                     <InputField
                                         name="name"
-                                        label="Full Name"
-                                        placeholder="John Doe"
+                                        label="نام و نام خانوادگی"
+                                        placeholder="نام خود را وارد کنید"
                                         autoComplete="name"
                                     />
 
                                     <InputField
                                         name="email"
                                         type="email"
-                                        label="Email Address"
-                                        placeholder="john@example.com"
+                                        label="نشانی ایمیل"
+                                        placeholder="user@example.com"
                                         autoComplete="email"
                                     />
 
@@ -229,7 +234,7 @@ export default function SignupPage() {
                                         <InputField
                                             name="password"
                                             type="password"
-                                            label="Password"
+                                            label="رمز عبور"
                                             placeholder="••••••••"
                                             autoComplete="new-password"
                                             action={
@@ -240,26 +245,28 @@ export default function SignupPage() {
                                                     style={{ color: "var(--color-primary)" }}
                                                 >
                                                     <Wand2 size={12} />
-                                                    Generate
+                                                    تولید رمز
                                                 </button>
                                             }
                                         />
                                         <InputField
                                             name="confirmPassword"
                                             type="password"
-                                            label="Confirm Password"
+                                            label="تکرار رمز عبور"
                                             placeholder="••••••••"
                                             autoComplete="new-password"
                                         />
                                     </div>
 
-                                    <Captcha
-                                        error={captchaError}
-                                        onVerify={(solved) => {
-                                            setIsCaptchaSolved(solved);
-                                            if (solved) setCaptchaError("");
-                                        }}
-                                    />
+                                    <div className="py-2">
+                                        <Captcha
+                                            error={captchaError}
+                                            onVerify={(solved) => {
+                                                setIsCaptchaSolved(solved);
+                                                if (solved) setCaptchaError("");
+                                            }}
+                                        />
+                                    </div>
 
                                     <Button
                                         type="submit"
@@ -267,20 +274,20 @@ export default function SignupPage() {
                                         loading={isSubmitting}
                                         fullWidth
                                         size="lg"
-                                        className="mt-2"
+                                        className="negints-btn"
                                     >
-                                        {!isSubmitting && <UserPlus className="mr-2" size={20} />}
-                                        {isSubmitting ? "Creating account..." : "Create Account"}
+                                        {!isSubmitting && <UserPlus className="ml-2" size={20} />}
+                                        {isSubmitting ? "در حال ساخت حساب..." : "ساخت حساب کاربری"}
                                     </Button>
                                 </Form>
                             )}
                         </Formik>
 
                         {/* Divider */}
-                        <div className="my-6 flex items-center gap-4">
+                        <div className="my-8 flex items-center gap-4">
                             <div className="h-px flex-1 bg-[var(--color-border)]"></div>
-                            <span className="text-xs font-medium text-[var(--color-text-secondary)] uppercase">
-                                or
+                            <span className="text-xs font-bold text-[var(--color-text-secondary)] uppercase">
+                                یا
                             </span>
                             <div className="h-px flex-1 bg-[var(--color-border)]"></div>
                         </div>
@@ -290,7 +297,7 @@ export default function SignupPage() {
                             variant="secondary"
                             fullWidth
                             size="lg"
-                            className="bg-white border border-gray-300 hover:bg-gray-50 flex items-center justify-center gap-3 py-3"
+                            className="bg-white border-2 border-gray-100 hover:border-[var(--color-primary)] hover:bg-gray-50 flex items-center justify-center gap-3 py-4 transition-all"
                             onClick={() => (window.location.href = "/api/auth/google")}
                         >
                             <svg
@@ -317,19 +324,28 @@ export default function SignupPage() {
                                     fill="#EA4335"
                                 />
                             </svg>
-                            <span className="text-gray-700 font-medium">Continue with Google</span>
+                            <span className="text-gray-700 font-bold">عضویت با حساب گوگل</span>
                         </Button>
 
-                        <div className="mt-6 text-center">
-                            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                                Already have an account?{" "}
+                        <div className="mt-8 text-center">
+                            <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
+                                قبلاً ثبت‌نام کرده‌اید؟{" "}
                                 <Link
                                     href="/login"
                                     className="font-bold hover:underline"
                                     style={{ color: "var(--color-primary)" }}
                                 >
-                                    Sign In
+                                    وارد شوید
                                 </Link>
+                            </p>
+                        </div>
+
+                        {/* Security Note */}
+                        <div className="mt-8 text-center pt-6 border-t border-gray-50">
+                            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-tertiary)" }}>
+                                🔒 سامانه مجهز به سیستم امنیتی هماهنگ با مرورگر است
+                                <br />
+                                محافظت در برابر حملات XSS و CSRF به صورت خودکار فعال می‌باشد
                             </p>
                         </div>
                     </div>

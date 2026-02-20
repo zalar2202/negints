@@ -102,6 +102,7 @@ export async function POST(request) {
                 description: description,
                 quantity: quantity,
                 unitPrice: unitPrice,
+                package: cartItem.package._id,
                 amount: amount
             };
         }));

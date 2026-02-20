@@ -3,6 +3,7 @@ import { verifyPayment } from '@/lib/zarinpal';
 import dbConnect from '@/lib/mongodb';
 import Invoice from '@/models/Invoice';
 import Payment from '@/models/Payment';
+import Package from '@/models/Package';
 
 export async function GET(request) {
     try {
@@ -13,20 +14,22 @@ export async function GET(request) {
         const authority = searchParams.get('Authority');
         const status = searchParams.get('Status');
 
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://negints.com';
+        
         if (!invoiceId || !authority) {
-            return NextResponse.redirect(new URL('/panel/accounting?status=error&message=invalid_params', request.url));
+            return NextResponse.redirect(new URL('/panel/accounting?status=error&message=invalid_params', appUrl));
         }
 
         if (status !== 'OK') {
-            return NextResponse.redirect(new URL(`/panel/accounting?status=cancelled&invoiceId=${invoiceId}`, request.url));
+            return NextResponse.redirect(new URL(`/panel/accounting?status=cancelled&invoiceId=${invoiceId}`, appUrl));
         }
 
         const invoice = await Invoice.findById(invoiceId);
         if (!invoice) {
-            return NextResponse.redirect(new URL('/panel/accounting?status=error&message=invoice_not_found', request.url));
+            return NextResponse.redirect(new URL('/panel/accounting?status=error&message=invoice_not_found', appUrl));
         }
 
-        const result = await verifyPayment(invoice.total, authority);
+        const result = await verifyPayment(invoice.total * 10, authority);
 
         if (result.success) {
             // Update Invoice
@@ -34,6 +37,20 @@ export async function GET(request) {
             invoice.paymentMethod = 'zarinpal';
             invoice.paymentNotes = `RefID: ${result.refId}`;
             await invoice.save();
+
+            // Decrement Inventory Stock
+            try {
+                for (const item of invoice.items) {
+                    if (item.package) {
+                        await Package.findByIdAndUpdate(item.package, {
+                            $inc: { stock: -Math.abs(item.quantity || 1) }
+                        });
+                    }
+                }
+            } catch (inventoryError) {
+                console.error('Inventory Update Error:', inventoryError);
+                // We don't block the response since payment was successful
+            }
 
             // Create Payment Record
             await Payment.create({
@@ -48,13 +65,13 @@ export async function GET(request) {
                 paymentDate: new Date()
             });
 
-            return NextResponse.redirect(new URL(`/panel/accounting?status=success&refId=${result.refId}`, request.url));
+            return NextResponse.redirect(new URL(`/panel/accounting?status=success&refId=${result.refId}`, appUrl));
         } else {
-            return NextResponse.redirect(new URL(`/panel/accounting?status=failed&message=${result.message}`, request.url));
+            return NextResponse.redirect(new URL(`/panel/accounting?status=failed&message=${result.message}`, appUrl));
         }
 
     } catch (error) {
         console.error('Zarinpal Verify Route Error:', error);
-        return NextResponse.redirect(new URL('/panel/accounting?status=error', request.url));
+        return NextResponse.redirect(new URL('/panel/accounting?status=error', process.env.NEXT_PUBLIC_APP_URL || 'https://negints.com'));
     }
 }
