@@ -7,7 +7,7 @@ import { InputField } from "@/components/forms/InputField";
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
 import { signupSchema, signupInitialValues } from "@/schemas/auth.schema";
-import { UserPlus, Shield, AlertCircle, Wand2, ArrowLeft } from "lucide-react";
+import { UserPlus, Shield, AlertCircle, Wand2, ArrowRight, Rocket, Database } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
