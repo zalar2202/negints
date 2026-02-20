@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import CommentSection from "@/components/website/CommentSection";
 import {
     ChevronRight, ShoppingCart, Share2, Heart, Check, CheckCircle2,
@@ -14,8 +17,12 @@ function formatCurrency(amount) {
 }
 
 export default function ProductPageClient({ product, category, relatedProducts }) {
+    const router = useRouter();
+    const { user, isAuthenticated } = useAuth();
+    const { refreshCart } = useCart();
     const [selectedImage, setSelectedImage] = useState(0);
     const [copied, setCopied] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
 
     const images = product.images?.length > 0 ? product.images : [];
     const features = product.features || [];
@@ -28,6 +35,33 @@ export default function ProductPageClient({ product, category, relatedProducts }
             await navigator.clipboard.writeText(url);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    const handleAddToCart = async () => {
+        if (!isAuthenticated) {
+            toast.error("برای خرید ابتدا باید وارد حساب کاربری خود شوید");
+            router.push(`/login?redirect=/products/${product.slug || product._id}`);
+            return;
+        }
+
+        setIsAdding(true);
+        try {
+            const { data } = await axios.post('/api/cart', { 
+                packageId: product._id,
+                quantity: 1
+            });
+
+            if (data.success) {
+                refreshCart();
+                toast.success("به سبد خرید اضافه شد");
+                router.push('/panel/cart');
+            }
+        } catch (error) {
+            console.error("Cart error:", error);
+            toast.error(error.response?.data?.error || "خطا در افزودن به سبد خرید");
+        } finally {
+            setIsAdding(false);
         }
     };
 
@@ -142,16 +176,25 @@ export default function ProductPageClient({ product, category, relatedProducts }
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex gap-3">
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <button
+                                onClick={handleAddToCart}
+                                disabled={isAdding || product.stock <= 0}
+                                className="flex-[2] inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[var(--color-primary)]/20"
+                            >
+                                {isAdding ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <ShoppingCart size={20} />}
+                                {product.stock > 0 ? "افزودن به سبد و خرید آنلاین" : "ناموجود"}
+                            </button>
+                            
                             <a
                                 href={`https://wa.me/989121234567?text=${encodeURIComponent(`سلام، درباره محصول "${product.name}" (کد: ${product.sku || "—"}) سؤال دارم.`)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all active:scale-[0.98]"
+                                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-700 dark:text-emerald-400 font-bold rounded-xl transition-all border border-emerald-600/20"
                             >
-                                <ShoppingCart size={20} />
-                                استعلام قیمت و خرید
+                                استعلام واتس‌اپ
                             </a>
+
                             <button
                                 onClick={handleShare}
                                 className="p-3.5 border border-[var(--color-border)] rounded-xl hover:bg-[var(--color-background-elevated)] transition-colors"

@@ -684,7 +684,7 @@ export default function SettingsPage() {
             <Card className="p-6 text-right" style={{ direction: 'rtl' }}>
                  <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--color-border)]">
                     <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/20 rounded-xl flex items-center justify-center text-yellow-600">
-                        <CreditCard className="w-6 h-6" /> // Assuming CreditCard is imported from lucide-react? No, imported as CreditCardIcon maybe? Let's check imports. Yes, CreditCard is imported.
+                        <CreditCard className="w-6 h-6" />
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-[var(--color-text-primary)]">تنظیمات درگاه پرداخت زرین‌پال</h2>
