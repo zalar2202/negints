@@ -44,16 +44,23 @@ export async function requestPayment({ amount, description, callbackUrl, metadat
             ? 'https://sandbox.zarinpal.com/pg/StartPay/'
             : 'https://www.zarinpal.com/pg/StartPay/';
 
-        const response = await axios.post(`${baseUrl}/request.json`, {
+        const requestData = {
             merchant_id: config.merchantId,
             amount: Math.round(amount), // Ensure integer (Toman)
             description,
             callback_url: callbackUrl,
-            metadata: {
-                mobile: String(metadata.mobile || ''),
-                email: String(metadata.email || '')
-            }
-        }, {
+        };
+
+        // Only include metadata if we have actual values to avoid Zarinpal validation issues
+        const zarinMetadata = {};
+        if (metadata.mobile) zarinMetadata.mobile = String(metadata.mobile).trim();
+        if (metadata.email) zarinMetadata.email = String(metadata.email).trim();
+        
+        if (Object.keys(zarinMetadata).length > 0) {
+            requestData.metadata = zarinMetadata;
+        }
+
+        const response = await axios.post(`${baseUrl}/request.json`, requestData, {
             timeout: 10000 // 10 second timeout
         });
 
