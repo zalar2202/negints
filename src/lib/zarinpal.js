@@ -38,7 +38,7 @@ export async function requestPayment({ amount, description, callbackUrl, metadat
 
         const baseUrl = config.isSandbox 
             ? 'https://sandbox.zarinpal.com/pg/v4/payment' 
-            : 'https://api.zarinpal.com/pg/v4/payment';
+            : 'https://payment.zarinpal.com/pg/v4/payment';
 
         const startPayUrl = config.isSandbox
             ? 'https://sandbox.zarinpal.com/pg/StartPay/'
@@ -91,7 +91,7 @@ export async function verifyPayment(amount, authority) {
         
         const baseUrl = config.isSandbox 
             ? 'https://sandbox.zarinpal.com/pg/v4/payment' 
-            : 'https://api.zarinpal.com/pg/v4/payment';
+            : 'https://payment.zarinpal.com/pg/v4/payment';
 
         const response = await axios.post(`${baseUrl}/verify.json`, {
             merchant_id: config.merchantId,
