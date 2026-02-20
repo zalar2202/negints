@@ -50,8 +50,8 @@ export async function requestPayment({ amount, description, callbackUrl, metadat
             description,
             callback_url: callbackUrl,
             metadata: {
-                mobile: metadata.mobile || '',
-                email: metadata.email || ''
+                mobile: String(metadata.mobile || ''),
+                email: String(metadata.email || '')
             }
         }, {
             timeout: 10000 // 10 second timeout
