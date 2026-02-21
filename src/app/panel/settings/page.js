@@ -767,6 +767,8 @@ export default function SettingsPage() {
     };
 
     // Tab configuration
+    const isAdmin = ['admin', 'manager'].includes(user.role);
+
     const tabs = [
         {
             id: "profile",
@@ -780,12 +782,13 @@ export default function SettingsPage() {
             icon: <SettingsIcon className="w-4 h-4" />,
             content: <PreferencesTab />,
         },
-        {
+        // Only show payment gateway settings for admins/managers
+        ...(isAdmin ? [{
             id: "payments",
             label: "درگاه پرداخت",
             icon: <CreditCard className="w-4 h-4" />,
             content: <PaymentsTab />,
-        },
+        }] : []),
         {
             id: "account",
             label: "مدیریت حساب",
