@@ -1244,7 +1244,7 @@ html {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: url('/assets/hero/hero-bg.jpg') no-repeat center center;
+    background: #0a3d62 url('/assets/hero/hero-bg.webp') no-repeat center center;
     background-size: cover;
     background-attachment: fixed;
 }
