@@ -188,14 +188,6 @@ export default function ProductPageClient({ product, category, relatedProducts }
                                 {product.stock > 0 ? "افزودن به سبد و خرید آنلاین" : "ناموجود"}
                             </button>
                             
-                            <a
-                                href={`https://wa.me/989121234567?text=${encodeURIComponent(`سلام، درباره محصول "${product.name}" (کد: ${product.sku || "—"}) سؤال دارم.`)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-700 dark:text-emerald-400 font-bold rounded-xl transition-all border border-emerald-600/20"
-                            >
-                                استعلام واتس‌اپ
-                            </a>
 
                             <button
                                 onClick={handleShare}

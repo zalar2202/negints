@@ -30,32 +30,6 @@ export default function WebsiteHeader() {
             id: "products",
             label: "محصولات",
             href: "/products",
-            dropdown: [
-                {
-                    id: "all-products",
-                    label: "🛒 همه محصولات",
-                    href: "/products",
-                    description: "مشاهده تمام محصولات",
-                },
-                {
-                    id: "kits",
-                    label: "🩺 کیت‌های تخصصی",
-                    href: "/products?category=kits",
-                    description: "کیت‌های امدادی و خودرویی",
-                },
-                {
-                    id: "instruments",
-                    label: "🧪 تجهیزات پزشکی",
-                    href: "/products?category=instruments",
-                    description: "تجهیزات تخصصی و جراحی",
-                },
-                {
-                    id: "healthcare",
-                    label: "🏠 سلامت خانواده",
-                    href: "/products?category=healthcare",
-                    description: "مراقبت در منزل و تصفیه هوا",
-                },
-            ],
         },
         { id: "blog", label: "مجله سلامت", href: "/blog" },
         { id: "contact", label: "تماس با ما", href: "/contact-us" },

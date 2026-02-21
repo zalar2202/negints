@@ -50,18 +50,17 @@ export default function WebsiteFooter() {
                     </a>
                 </div>
 
-                {/* Enamad Debug/Fix */}
+                {/* Enamad Static Implementation */}
                 <div className="flex justify-center mb-8">
                     <div className="bg-white/95 p-3 rounded-2xl shadow-xl border border-white/20 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
                         <a 
-                            referrerPolicy='origin' 
                             target='_blank' 
                             href='https://trustseal.enamad.ir/?id=701546&Code=kQhdBY6Mi0OEMwAYP0SAXJpelRU5jiHU'
+                            rel="noopener noreferrer"
                             className="block"
                         >
                             <img 
-                                referrerPolicy='origin' 
-                                src='https://trustseal.enamad.ir/logo.aspx?id=701546&Code=kQhdBY6Mi0OEMwAYP0SAXJpelRU5jiHU' 
+                                src='/assets/logo/enamad.png' 
                                 alt='Enamad Seal' 
                                 className="h-16 w-auto cursor-pointer"
                                 style={{ minWidth: '60px' }}
