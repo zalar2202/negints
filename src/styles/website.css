@@ -1825,18 +1825,6 @@ html {
 /* ===================================
    Footer
    =================================== */
-.footer {
-    display: flex;
-    justify-content: center;
-    padding: 40px 20px;
-    background: var(--color-background-secondary);
-    border-top: 1px solid var(--color-border);
-    color: #4b5563;
-}
-
-.footer-content {
-    text-align: center;
-}
 
 .footer-brand {
     font-size: 1.5rem;
@@ -3377,4 +3365,17 @@ html {
     .contact-info-card {
         padding: 24px;
     }
+}
+
+/* Definitive button overrides for header visibility */
+.nav-dashboard-btn, .nav-signup-btn {
+    background: var(--gradient-medical) !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-weight: 700 !important;
+}
+
+.nav-dashboard-btn:hover, .nav-signup-btn:hover {
+    filter: brightness(1.1) !important;
+    transform: translateY(-1px) !important;
 }
