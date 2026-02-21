@@ -57,7 +57,7 @@ export default function Hero() {
                 </p>
                 <div className="hero-cta animate-fade-in-up delay-500">
                     <Link href="#contact" className="negints-btn" onClick={handleContactClick}>
-                        دریافت مشاوره
+                        تماس با ما
                     </Link>
                     <Link href="/products" className="negints-alt-btn">
                         مشاهده محصولات

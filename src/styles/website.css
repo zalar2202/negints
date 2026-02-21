@@ -3402,3 +3402,64 @@ html {
     transform: translateY(-1px) !important;
     box-shadow: 0 6px 20px rgba(10, 61, 98, 0.3) !important;
 }
+
+/* Hero Section Mobile Responsiveness */
+@media (max-width: 768px) {
+    .hero {
+        background-attachment: scroll; /* Fixed background is broken on many mobile browsers */
+        background-position: center bottom;
+        min-height: auto;
+        padding-top: 140px;
+        padding-bottom: 80px;
+        margin-top: -100px;
+    }
+
+    .hero-content {
+        padding: 30px 20px;
+        margin: 0 15px;
+        border-radius: 24px;
+        gap: 16px;
+    }
+
+    .website-layout .hero-title {
+        font-size: 2.8rem;
+        word-break: keep-all;
+    }
+
+    .hero-tagline {
+        font-size: 1rem;
+        gap: 8px;
+    }
+
+    .hero-dot {
+        font-size: 1.2rem;
+    }
+
+    .hero-description {
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+
+    .hero-cta {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+
+    .hero-cta .negints-btn,
+    .hero-cta .negints-alt-btn {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .website-layout .hero-title {
+        font-size: 2.2rem;
+    }
+
+    .hero-tagline {
+        font-size: 0.9rem;
+    }
+}
