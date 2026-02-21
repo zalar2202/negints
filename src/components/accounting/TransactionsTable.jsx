@@ -66,7 +66,7 @@ const TransactionsTable = ({ transactions, type = 'user' }) => {
             <div style={{ padding: '24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="bg-[var(--color-background-elevated)]/30 backdrop-blur-sm">
                 <h3 className="font-black text-xl text-[var(--color-text-primary)]">فهرست تراکنش‌های اخیر</h3>
                 <div className="flex gap-2">
-                    <span className="text-xs font-bold text-[var(--color-text-tertiary)] bg-[var(--color-background-tertiary)] px-3 py-1 rounded-full">{transactions?.length.toLocaleString('fa-IR')} مورد</span>
+                    <span className="text-xs font-bold text-[var(--color-text-tertiary)] bg-[var(--color-background-tertiary)] px-3 py-1 rounded-full">{(transactions?.length || 0).toLocaleString('fa-IR')} مورد</span>
                 </div>
             </div>
             <div className="table-responsive" style={{ overflowX: 'auto' }}>

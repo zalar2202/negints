@@ -1,5 +1,6 @@
+"use client";
 import React from 'react';
-import { Box, Typography, Grid, Paper, Chip } from '@mui/material';
+import { DollarSign } from 'lucide-react';
 // We can mix MUI with the custom CSS if needed, but per instructions, try to stick to "Vanilla CSS" or the existing design system.
 // However, the project HAS MUI installed. 
 // "use client"; at top.
