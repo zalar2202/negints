@@ -3368,14 +3368,15 @@ html {
 }
 
 /* Definitive button overrides for header visibility */
-.nav-dashboard-btn, .nav-signup-btn {
+.nav-dashboard-btn, .nav-signup-btn, .nav-cta-btn {
     background: var(--gradient-medical) !important;
-    color: #ffffff !important;
+    color: var(--color-text-inverse) !important;
     border: none !important;
     font-weight: 700 !important;
 }
 
-.nav-dashboard-btn:hover, .nav-signup-btn:hover {
+.nav-dashboard-btn:hover, .nav-signup-btn:hover, .nav-cta-btn:hover {
     filter: brightness(1.1) !important;
     transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(10, 61, 98, 0.3) !important;
 }

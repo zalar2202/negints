@@ -24,6 +24,14 @@
     --gradient-medical: linear-gradient(135deg, #0a3d62 0%, #3c6382 100%);
     --gradient-innovative: linear-gradient(135deg, #38ada9 0%, #079992 100%);
     --gradient-surface: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+
+    /* Text & Semantic Colors */
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-tertiary: #94a3b8;
+    --color-text-inverse: #ffffff;
+    --color-border: #e2e8f0;
+    --color-background-elevated: #ffffff;
 }
 
 
@@ -38,6 +46,12 @@
     --instrument-color: #60a3bc;
     --healthcare-color: #3c6382;
     --pharma-color: #0a3d62;
+
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #94a3b8;
+    --color-text-inverse: #ffffff;
+    --color-border: #1e293b;
+    --color-background-elevated: #1e293b;
 }
 
 /* System preference fallback */
