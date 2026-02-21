@@ -3405,6 +3405,10 @@ html {
 
 /* Hero Section Mobile Responsiveness */
 @media (max-width: 768px) {
+    .main-content {
+        padding-top: 100px;
+    }
+
     .hero {
         background-attachment: scroll;
         background-position: 70% 50%; /* Shift to show more equipment on mobile */
