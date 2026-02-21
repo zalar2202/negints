@@ -3406,60 +3406,69 @@ html {
 /* Hero Section Mobile Responsiveness */
 @media (max-width: 768px) {
     .hero {
-        background-attachment: scroll; /* Fixed background is broken on many mobile browsers */
-        background-position: center bottom;
-        min-height: auto;
-        padding-top: 140px;
-        padding-bottom: 80px;
+        background-attachment: scroll;
+        background-position: 70% 50%; /* Shift to show more equipment on mobile */
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding-top: 100px;
+        padding-bottom: 60px;
         margin-top: -100px;
     }
 
+    .hero-overlay {
+        opacity: 0.7; /* Lighter overlay on mobile to show image better */
+    }
+
     .hero-content {
-        padding: 30px 20px;
-        margin: 0 15px;
-        border-radius: 24px;
-        gap: 16px;
+        padding: 40px 24px;
+        margin: 0 20px;
+        border-radius: 28px;
+        gap: 20px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px) saturate(180%);
     }
 
     .website-layout .hero-title {
-        font-size: 2.8rem;
-        word-break: keep-all;
+        font-size: 2.4rem;
+        line-height: 1.2;
+        margin-bottom: 8px;
     }
 
     .hero-tagline {
-        font-size: 1rem;
-        gap: 8px;
-    }
-
-    .hero-dot {
-        font-size: 1.2rem;
+        font-size: 0.95rem;
+        gap: 6px;
+        margin-bottom: 4px;
     }
 
     .hero-description {
-        font-size: 1.05rem;
+        font-size: 1rem;
         line-height: 1.6;
+        opacity: 0.9;
     }
 
     .hero-cta {
-        flex-direction: column;
         width: 100%;
         gap: 12px;
+        margin-top: 8px;
     }
 
     .hero-cta .negints-btn,
     .hero-cta .negints-alt-btn {
         width: 100%;
-        padding: 12px 24px;
+        padding: 14px;
         font-size: 1rem;
+        border-radius: 14px;
     }
 }
 
 @media (max-width: 480px) {
     .website-layout .hero-title {
-        font-size: 2.2rem;
+        font-size: 2rem;
     }
-
-    .hero-tagline {
-        font-size: 0.9rem;
+    
+    .hero-content {
+        padding: 30px 20px;
+        margin: 0 15px;
     }
 }

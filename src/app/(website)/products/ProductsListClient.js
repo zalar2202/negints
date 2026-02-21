@@ -243,7 +243,7 @@ export default function ProductsListClient({ products, categories }) {
 
                                         <div className="p-4 flex-1 flex flex-col">
                                             <div className="flex justify-between items-start mb-1 gap-2">
-                                                <h3 className="font-black text-[var(--color-text-primary)] text-sm line-clamp-1 leading-snug group-hover:text-[var(--color-primary)] transition-colors">
+                                                <h3 className="font-black text-[var(--color-text-primary)] text-sm line-clamp-2 leading-snug group-hover:text-[var(--color-primary)] transition-colors">
                                                     {product.name}
                                                 </h3>
                                             </div>
