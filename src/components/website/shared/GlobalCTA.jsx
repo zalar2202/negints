@@ -9,7 +9,8 @@ import SmartCTA from "@/components/website/shared/SmartCTA";
 export default function GlobalCTA({
     title = "آماده همکاری با ما هستید؟",
     description = "ما آماده‌ایم تا بهترین راهکارهای تجهیزات پزشکی را برای مرکز درمانی یا داروخانه شما فراهم کنیم. با ما در تماس باشید.",
-    primaryButtonLabel = "شروع گفتگو و مشاوره",
+    primaryButtonLabel = "تماس با کارشناسان ما",
+    primaryButtonLink = "/contact-us",
     secondaryButtonLabel = null,
     secondaryButtonLink = null,
 }) {
@@ -29,7 +30,12 @@ export default function GlobalCTA({
                 <p className="cta-description">{description}</p>
 
                 <div className="cta-buttons">
-                    <SmartCTA label={primaryButtonLabel} className="negints-btn large" />
+                    <SmartCTA 
+                        label={primaryButtonLabel} 
+                        guestHref={primaryButtonLink} 
+                        userHref={primaryButtonLink} 
+                        className="negints-btn large" 
+                    />
                 </div>
 
                 {secondaryButtonLabel && (

@@ -57,10 +57,9 @@ export default function WebsiteHeader() {
                 },
             ],
         },
-        { id: "why-us", label: "چرا ما؟", href: isHomepage ? "#why-us" : "/#why-us" },
-        { id: "process", label: "مسیر همکاری", href: isHomepage ? "#process" : "/#process" },
-        { id: "faq", label: "سوالات متداول", href: isHomepage ? "#faq" : "/#faq" },
         { id: "blog", label: "مجله سلامت", href: "/blog" },
+        { id: "contact", label: "تماس با ما", href: "/contact-us" },
+        { id: "faq", label: "سوالات متداول", href: isHomepage ? "#faq" : "/#faq" },
     ];
 
 
@@ -111,14 +110,6 @@ export default function WebsiteHeader() {
         }
     };
 
-    const handleContactClick = (e) => {
-        e.preventDefault();
-        const element = document.getElementById("contact");
-        if (element) {
-            element.scrollIntoView({ behavior: "smooth" });
-        }
-        setIsMobileMenuOpen(false);
-    };
 
     const renderNavItem = (item, isMobile = false) => {
         const hasDropdown = item.dropdown && item.dropdown.length > 0;
@@ -253,11 +244,10 @@ export default function WebsiteHeader() {
                                     <LayoutDashboard className="w-4 h-4 mr-1 ml-1" /> پنل کاربری
                                 </Link>
                                 <Link
-                                    href="#contact"
+                                    href="/contact-us"
                                     className="negints-btn nav-cta-btn"
-                                    onClick={handleContactClick}
                                 >
-                                    مشاوره رایگان
+                                    تماس با ما
                                 </Link>
                             </>
                         ) : (
@@ -270,11 +260,10 @@ export default function WebsiteHeader() {
                                     <UserPlus className="w-4 h-4 mr-1 ml-1" /> ورود / ثبت‌نام
                                 </Link>
                                 <Link
-                                    href="#contact"
+                                    href="/contact-us"
                                     className="negints-btn nav-cta-btn"
-                                    onClick={handleContactClick}
                                 >
-                                    مشاوره رایگان
+                                    تماس با ما
                                 </Link>
                             </>
                         )}
@@ -309,11 +298,11 @@ export default function WebsiteHeader() {
                                     پنل کاربری
                                 </Link>
                                 <Link
-                                    href="#contact"
+                                    href="/contact-us"
                                     className="negints-btn mobile-cta-btn"
-                                    onClick={handleContactClick}
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    مشاوره رایگان
+                                    تماس با ما
                                 </Link>
                             </>
                         ) : (

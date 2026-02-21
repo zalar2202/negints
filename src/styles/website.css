@@ -589,10 +589,12 @@ select:autofill {
 /* Old header styles removed - using new top header below */
 
 .footer {
-    background: var(--color-footer);
-    color: #ffffff;
-    padding: 60px 0 30px;
+    background-color: #0d1117 !important; /* Force dark background for both modes */
+    color: #ffffff !important;
+    padding: 80px 0 40px;
     margin-top: 80px;
+    position: relative;
+    z-index: 10;
 }
 
 .footer-content {
@@ -648,7 +650,8 @@ select:autofill {
     padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.65);
+    text-align: center;
 }
 
 [data-theme="dark"] .footer {
@@ -1053,13 +1056,13 @@ html {
 }
 
 .nav-signup-btn {
-    background-color: var(--color-background-elevated) !important;
-    border: 1px solid var(--color-border) !important;
-    color: var(--color-primary) !important;
+    background: var(--gradient-medical) !important;
+    color: var(--color-text-inverse) !important;
+    border: none !important;
     padding: 8px 16px !important;
     font-size: 0.9rem !important;
     border-radius: 12px !important;
-    box-shadow: none !important;
+    box-shadow: 0 4px 12px rgba(10, 61, 98, 0.2) !important;
 }
 
 .nav-signup-btn:hover {

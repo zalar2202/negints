@@ -187,7 +187,6 @@ export default function HomePage() {
             <Services />
             <WhyNegin />
             <FeaturedProducts />
-            <ProcessTimeline steps={processSteps} />
 
             <MedicalBrands />
             <FAQAccordion items={faqItems} />
