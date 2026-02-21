@@ -85,7 +85,22 @@ const InvoiceSchema = new mongoose.Schema(
 
         paymentNotes: { type: String },
         
-        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        
+        // Shipping Details
+        shippingMethod: {
+            type: String,
+            enum: ['peyk', 'post', null],
+            default: null
+        },
+        shippingAddress: {
+            street: { type: String },
+            city: { type: String },
+            state: { type: String },
+            zip: { type: String },
+            receiverName: { type: String },
+            receiverPhone: { type: String },
+        },
     },
     { timestamps: true }
 );

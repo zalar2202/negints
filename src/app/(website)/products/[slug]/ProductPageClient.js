@@ -221,6 +221,38 @@ export default function ProductPageClient({ product, category, relatedProducts }
                             </div>
                         </div>
 
+                        {/* Physical Specifications */}
+                        {(product.weight > 0 || product.material || (product.dimensions && (product.dimensions.length > 0 || product.dimensions.width > 0 || product.dimensions.height > 0))) && (
+                            <div className="pt-8 border-t border-[var(--color-border)]">
+                                <h2 className="text-sm font-black text-[var(--color-text-primary)] mb-5 uppercase tracking-widest flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                    مشخصات فیزیکی
+                                </h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {product.weight > 0 && (
+                                        <div className="flex flex-col p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30 border border-transparent">
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase mb-1">وزن</span>
+                                            <span className="text-[12px] font-black text-[var(--color-text-primary)]">{product.weight} گرم</span>
+                                        </div>
+                                    )}
+                                    {product.material && (
+                                        <div className="flex flex-col p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30 border border-transparent">
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase mb-1">جنس / متریال</span>
+                                            <span className="text-[12px] font-black text-[var(--color-text-primary)]">{product.material}</span>
+                                        </div>
+                                    )}
+                                    {product.dimensions && (product.dimensions.length > 0 || product.dimensions.width > 0 || product.dimensions.height > 0) && (
+                                        <div className="flex flex-col p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30 border border-transparent">
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase mb-1">ابعاد (سانتی‌متر)</span>
+                                            <span className="text-[12px] font-black text-[var(--color-text-primary)]" dir="ltr">
+                                                {product.dimensions.length || 0} × {product.dimensions.width || 0} × {product.dimensions.height || 0}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Specifications - High Density Table */}
                         {product.specifications?.length > 0 && (
                             <div className="pt-8 border-t border-[var(--color-border)]">

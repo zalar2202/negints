@@ -30,6 +30,12 @@ import {
     Building2,
     Globe,
     DollarSign,
+    Copy,
+    Check,
+    Truck,
+    MapPin,
+    User as UserIcon,
+    Phone,
 } from "lucide-react";
 import * as Yup from "yup";
 import { useSearchParams } from "next/navigation";
@@ -79,6 +85,17 @@ function InvoicesPage() {
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [sendingId, setSendingId] = useState(null);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
+    const [selectedMethod, setSelectedMethod] = useState(null);
+    const [copiedField, setCopiedField] = useState(null);
+    const [paymentStep, setPaymentStep] = useState("shipping"); // shipping, method, bank_info
+    const [shippingForm, setShippingForm] = useState({
+        street: "",
+        city: "",
+        state: "",
+        zip: "",
+        receiverName: user?.name || "",
+        receiverPhone: user?.phone || "",
+    });
 
     useEffect(() => {
         const init = async () => {
@@ -107,6 +124,23 @@ function InvoicesPage() {
             }
         }
     }, [invoiceIdParam, invoices]);
+
+    // Pre-fill shipping form when invoice is selected
+    useEffect(() => {
+        if (selectedInvoice && user) {
+            setShippingForm({
+                street: selectedInvoice.shippingAddress?.street || user.address?.street || "",
+                city: selectedInvoice.shippingAddress?.city || user.address?.city || "تهران",
+                state: selectedInvoice.shippingAddress?.state || user.address?.state || "تهران",
+                zip: selectedInvoice.shippingAddress?.zip || user.address?.zip || "",
+                receiverName: selectedInvoice.shippingAddress?.receiverName || user.name || "",
+                receiverPhone: selectedInvoice.shippingAddress?.receiverPhone || user.phone || "",
+            });
+            // If they already have an address and method, we could skip shipping step, 
+            // but for now let's always show it for confirmation as requested.
+            setPaymentStep("shipping");
+        }
+    }, [selectedInvoice, user]);
 
     const fetchInvoices = async () => {
         setLoading(true);
@@ -879,6 +913,37 @@ function InvoicesPage() {
                             </div>
                         </div>
 
+                        {selectedInvoice.shippingMethod && (
+                            <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-[var(--color-border)] mt-6">
+                                <h4 className="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                                    <Truck className="w-3 h-3" />
+                                    اطلاعات ارسال
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                                    <div>
+                                        <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">روش ارسال</p>
+                                        <p className="text-sm font-bold text-[var(--color-text-primary)]">
+                                            {selectedInvoice.shippingMethod === 'peyk' ? 'ارسال با پیک (پرداخت هزینه در محل)' : 'ارسال با پست پیشتاز (پرداخت هزینه در محل)'}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">تحویل‌گیرنده</p>
+                                        <p className="text-sm font-bold text-[var(--color-text-primary)]">
+                                            {selectedInvoice.shippingAddress?.receiverName}
+                                            {selectedInvoice.shippingAddress?.receiverPhone && <span className="mr-2 text-xs font-normal text-gray-500">({selectedInvoice.shippingAddress.receiverPhone})</span>}
+                                        </p>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">نشانی پستی</p>
+                                        <p className="text-sm text-[var(--color-text-primary)] leading-relaxed">
+                                            {selectedInvoice.shippingAddress?.state}، {selectedInvoice.shippingAddress?.city}، {selectedInvoice.shippingAddress?.street}
+                                            {selectedInvoice.shippingAddress?.zip && <span className="mr-2 inline-block px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-[10px]">کد پستی: {selectedInvoice.shippingAddress.zip}</span>}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {selectedInvoice.paymentPlan?.isInstallment && (
                             <div className="bg-indigo-50 dark:bg-indigo-900/10 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800/20">
                                 <h4 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 flex items-center gap-2">
@@ -983,88 +1048,278 @@ function InvoicesPage() {
                 )}
             </Modal>
 
-            {/* Payment Method Selection Modal */}
+            {/* Payment & Shipping Modal */}
             <Modal
                 isOpen={isPaymentModalOpen}
-                onClose={() => setIsPaymentModalOpen(false)}
-                title="انتخاب روش پرداخت"
+                onClose={() => {
+                    setIsPaymentModalOpen(false);
+                    setSelectedMethod(null);
+                    setPaymentStep("shipping");
+                }}
+                title={
+                    paymentStep === "shipping" ? "اطلاعات ارسال کالا" : 
+                    selectedMethod === 'bank_transfer' ? "اطلاعات واریز بانکی" : 
+                    "انتخاب روش پرداخت"
+                }
                 size="md"
             >
                 <div className="space-y-6 p-2 text-right" style={{ direction: 'rtl' }}>
-                    <p className="text-sm text-[var(--color-text-secondary)]">
-                        لطفاً روش پرداخت مورد نظر خود را برای فاکتور شماره <strong>{selectedInvoice?.invoiceNumber}</strong> انتخاب کنید.
-                    </p>
                     
-                    <div className="grid grid-cols-1 gap-3">
-                        {[
-                            { id: 'zarinpal', name: 'پرداخت آنلاین (زرین‌پال)', desc: 'پرداخت با تمامی کارت‌های عضو شتاب', icon: <CreditCard className="w-5 h-5 text-indigo-600" /> },
-                            { id: 'bank_transfer', name: 'کارت به کارت / حواله بانکی', desc: 'واریز مستقیم به حساب شرکت', icon: <Building2 className="w-5 h-5" /> },
-                            { id: 'crypto', name: 'ارز دیجیتال', desc: 'USDT (TRC20), BTC, or ETH', icon: <Globe className="w-5 h-5" /> },
-                            { id: 'cash', name: 'پرداخت نقدی', desc: 'مراجعه حضوری به دفتر مرکزی', icon: <CreditCard className="w-5 h-5" /> },
-                            { id: 'stripe', name: 'Stripe (International)', desc: 'Credit / Debit Card (USD/EUR)', icon: <Globe className="w-5 h-5" /> }
-                        ].map((method) => (
-                            <button
-                                key={method.id}
-                                onClick={async () => {
-                                    if (method.id === 'zarinpal') {
-                                        try {
-                                            const { data } = await axios.post('/api/payments/zarinpal/request', {
-                                                invoiceId: selectedInvoice._id
-                                            });
-                                            if (data.url) {
-                                                window.location.href = data.url;
-                                            } else {
-                                                toast.error("خطا در ایجاد لینک پرداخت");
-                                            }
-                                        } catch (err) {
-                                            toast.error(err.response?.data?.error || "سیستم پرداخت در دسترس نیست");
-                                        }
-                                        return;
-                                    }
-                                    if (method.id === 'stripe') {
-                                        try {
-                                            const { data } = await axios.post('/api/payments/stripe/checkout', {
-                                                invoiceId: selectedInvoice._id
-                                            });
-                                            if (data.url) {
-                                                window.location.href = data.url;
-                                            } else {
-                                                toast.error("Failed to generate checkout link");
-                                            }
-                                        } catch (err) {
-                                            toast.error(err.response?.data?.error || "Payment system unavailable");
-                                        }
-                                        return;
-                                    }
-                                    try {
-                                        const { data } = await axios.patch(`/api/invoices/${selectedInvoice._id}/payment-method`, {
-                                            paymentMethod: method.id
-                                        });
-                                        if (data.success) {
-                                            toast.success(`روش ${method.name} انتخاب شد. منتظر تایید مدیریت باشید.`);
-                                            setIsPaymentModalOpen(false);
-                                            fetchInvoices();
-                                        }
-                                    } catch (err) {
-                                        toast.error("خطا در ثبت روش پرداخت");
-                                    }
-                                }}
-                                className="flex items-center gap-4 p-4 rounded-xl border border-[var(--color-border)] hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all text-right group"
-                            >
-                                <div className="p-2.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-100 group-hover:text-indigo-600 rounded-lg transition-colors">
-                                    {method.icon}
+                    {paymentStep === "shipping" && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
+                             <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800 flex items-start gap-3">
+                                <Truck className="w-5 h-5 text-indigo-600 mt-0.5 shrink-0" />
+                                <p className="text-sm text-indigo-700 dark:text-indigo-300 leading-relaxed font-medium">
+                                    لطفاً آدرس دقیق و مشخصات تحویل‌گیرنده را تایید یا تکمیل کنید تا روش ارسال متناسب با محل شما تعیین گردد.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-[var(--color-text-primary)]">نام تحویل‌گیرنده</label>
+                                    <div className="relative">
+                                        <input 
+                                            className="w-full p-2.5 pr-10 rounded-lg border bg-[var(--color-background-elevated)] border-[var(--color-border)] focus:ring-2 focus:ring-indigo-500 text-right"
+                                            value={shippingForm.receiverName}
+                                            onChange={(e) => setShippingForm({...shippingForm, receiverName: e.target.value})}
+                                            placeholder="نام و نام خانوادگی"
+                                        />
+                                        <UserIcon className="w-4 h-4 absolute right-3 top-3.5 text-gray-400" />
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <h4 className="font-bold text-[var(--color-text-primary)]">{method.name}</h4>
-                                    <p className="text-xs text-[var(--color-text-secondary)]">{method.desc}</p>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-[var(--color-text-primary)]">شماره تماس</label>
+                                    <div className="relative">
+                                        <input 
+                                            className="w-full p-2.5 pr-10 rounded-lg border bg-[var(--color-background-elevated)] border-[var(--color-border)] focus:ring-2 focus:ring-indigo-500 text-left"
+                                            value={shippingForm.receiverPhone}
+                                            onChange={(e) => setShippingForm({...shippingForm, receiverPhone: e.target.value})}
+                                            placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                                            dir="ltr"
+                                        />
+                                        <Phone className="w-4 h-4 absolute right-3 top-3.5 text-gray-400" />
+                                    </div>
                                 </div>
-                            </button>
-                        ))}
-                    </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-[var(--color-text-primary)]">استان</label>
+                                    <input 
+                                        className="w-full p-2.5 rounded-lg border bg-[var(--color-background-elevated)] border-[var(--color-border)] focus:ring-2 focus:ring-indigo-500"
+                                        value={shippingForm.state}
+                                        onChange={(e) => setShippingForm({...shippingForm, state: e.target.value})}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-[var(--color-text-primary)]">شهر</label>
+                                    <input 
+                                        className="w-full p-2.5 rounded-lg border bg-[var(--color-background-elevated)] border-[var(--color-border)] focus:ring-2 focus:ring-indigo-500"
+                                        value={shippingForm.city}
+                                        onChange={(e) => setShippingForm({...shippingForm, city: e.target.value})}
+                                    />
+                                </div>
+                                <div className="md:col-span-2 space-y-2">
+                                    <label className="text-sm font-bold text-[var(--color-text-primary)]">نشانی دقیق پستی</label>
+                                    <div className="relative">
+                                        <textarea 
+                                            className="w-full p-2.5 pr-10 rounded-lg border bg-[var(--color-background-elevated)] border-[var(--color-border)] focus:ring-2 focus:ring-indigo-500 min-h-[80px]"
+                                            value={shippingForm.street}
+                                            onChange={(e) => setShippingForm({...shippingForm, street: e.target.value})}
+                                            placeholder="خیابان، کوچه، پلاک، واحد"
+                                        />
+                                        <MapPin className="w-4 h-4 absolute right-3 top-3 text-gray-400" />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-[var(--color-text-primary)]">کد پستی</label>
+                                    <input 
+                                        className="w-full p-2.5 rounded-lg border bg-[var(--color-background-elevated)] border-[var(--color-border)] focus:ring-2 focus:ring-indigo-500 text-left"
+                                        value={shippingForm.zip}
+                                        onChange={(e) => setShippingForm({...shippingForm, zip: e.target.value})}
+                                        dir="ltr"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="pt-4 border-t border-[var(--color-border)]">
+                                <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg mb-4 text-xs">
+                                    <span className="font-bold block mb-1">روش ارسال پیش‌بینی شده:</span>
+                                    {shippingForm.city?.includes("تهران") ? (
+                                        <p className="text-green-600 dark:text-green-400 font-bold flex items-center gap-2">
+                                            <Truck className="w-3.5 h-3.5" />
+                                            ارسال با پیک (هزینه در محل)
+                                        </p>
+                                    ) : (
+                                        <p className="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-2">
+                                            <Truck className="w-3.5 h-3.5" />
+                                            ارسال با پست پیشتاز (هزینه در محل)
+                                        </p>
+                                    )}
+                                </div>
+                                <Button 
+                                    className="w-full" 
+                                    onClick={() => {
+                                        if (!shippingForm.street || !shippingForm.city || !shippingForm.receiverName) {
+                                            toast.error("لطفاً موارد ضروری را تکمیل کنید");
+                                            return;
+                                        }
+                                        setPaymentStep("method");
+                                    }}
+                                >
+                                    تایید و ادامه به پرداخت
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+
+                    {paymentStep === "method" && !selectedMethod && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-left-2">
+                            <p className="text-sm text-[var(--color-text-secondary)]">
+                                لطفاً روش پرداخت مورد نظر خود را برای فاکتور شماره <strong>{selectedInvoice?.invoiceNumber}</strong> انتخاب کنید.
+                            </p>
+                            
+                            <div className="grid grid-cols-1 gap-3">
+                                {[
+                                    { id: 'zarinpal', name: 'پرداخت آنلاین (زرین‌پال)', desc: 'پرداخت با تمامی کارت‌های عضو شتاب', icon: <CreditCard className="w-5 h-5 text-indigo-600" /> },
+                                    { id: 'bank_transfer', name: 'کارت به کارت / حواله بانکی', desc: 'واریز مستقیم به حساب شرکت', icon: <Building2 className="w-5 h-5" /> },
+                                    { id: 'cash', name: 'پرداخت نقدی', desc: 'مراجعه حضوری به دفتر مرکزی', icon: <CreditCard className="w-5 h-5" /> },
+                                ].map((method) => (
+                                    <button
+                                        key={method.id}
+                                        onClick={async () => {
+                                            // Determine shipping method
+                                            const shipMethod = shippingForm.city?.includes("تهران") ? "peyk" : "post";
+                                            
+                                            if (method.id === 'bank_transfer') {
+                                                setSelectedMethod('bank_transfer');
+                                                // We will save once they confirm on the next screen
+                                                return;
+                                            }
+
+                                            if (method.id === 'zarinpal') {
+                                                try {
+                                                    // Save shipping info first or pass it to zarinpal request
+                                                    await axios.patch(`/api/invoices/${selectedInvoice._id}/payment-method`, {
+                                                        paymentMethod: 'zarinpal',
+                                                        shippingMethod: shipMethod,
+                                                        shippingAddress: shippingForm
+                                                    });
+
+                                                    const { data } = await axios.post('/api/payments/zarinpal/request', {
+                                                        invoiceId: selectedInvoice._id
+                                                    });
+                                                    if (data.url) {
+                                                        window.location.href = data.url;
+                                                    } else {
+                                                        toast.error("خطا در ایجاد لینک پرداخت");
+                                                    }
+                                                } catch (err) {
+                                                    toast.error(err.response?.data?.error || "سیستم پرداخت در دسترس نیست");
+                                                }
+                                                return;
+                                            }
+
+                                            try {
+                                                const { data } = await axios.patch(`/api/invoices/${selectedInvoice._id}/payment-method`, {
+                                                    paymentMethod: method.id,
+                                                    shippingMethod: shipMethod,
+                                                    shippingAddress: shippingForm
+                                                });
+                                                if (data.success) {
+                                                    toast.success(`روش ${method.name} انتخاب شد. منتظر تایید مدیریت باشید.`);
+                                                    setIsPaymentModalOpen(false);
+                                                    fetchInvoices();
+                                                }
+                                            } catch (err) {
+                                                toast.error("خطا در ثبت روش پرداخت");
+                                            }
+                                        }}
+                                        className="flex items-center gap-4 p-4 rounded-xl border border-[var(--color-border)] hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all text-right group"
+                                    >
+                                        <div className="p-2.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-100 group-hover:text-indigo-600 rounded-lg transition-colors">
+                                            {method.icon}
+                                        </div>
+                                        <div className="flex-1">
+                                            <h4 className="font-bold text-[var(--color-text-primary)]">{method.name}</h4>
+                                            <p className="text-xs text-[var(--color-text-secondary)]">{method.desc}</p>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                            <Button variant="secondary" className="w-full mt-4" onClick={() => setPaymentStep("shipping")}>
+                                بازگشت به اطلاعات ارسال
+                            </Button>
+                        </div>
+                    )}
+
+                    {paymentStep === "method" && selectedMethod === 'bank_transfer' && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-left-2 transition-all">
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800 mb-4">
+                                <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed font-medium">
+                                    لطفاً مبلغ فاکتور را به حساب زیر واریز نموده و سپس برای تایید نهایی با پشتیبانی تماس بگیرید یا منتظر تایید ادمین باشید.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                {[
+                                    { label: 'نام صاحب حساب', value: 'هومن اسکندری', key: 'owner' },
+                                    { label: 'نام بانک', value: 'پاسارگاد', key: 'bank' },
+                                    { label: 'شماره کارت', value: '5022291574943906', display: '5022 2915 7494 3906', key: 'card' },
+                                    { label: 'شماره حساب', value: '777.888.23343751.1', key: 'account' },
+                                    { label: 'شماره شبا', value: 'IR330570077700008104956001', key: 'sheba' },
+                                ].map((item) => (
+                                    <div key={item.key} className="p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-background-secondary)]/50 flex items-center justify-between">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] text-[var(--color-text-tertiary)] uppercase font-bold mb-1">{item.label}</span>
+                                            <span className="text-sm font-black text-[var(--color-text-primary)]" dir="ltr">{item.display || item.value}</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(item.value);
+                                                setCopiedField(item.key);
+                                                toast.success(`${item.label} کپی شد`);
+                                                setTimeout(() => setCopiedField(null), 2000);
+                                            }}
+                                            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors text-gray-500"
+                                        >
+                                            {copiedField === item.key ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="pt-4 border-t border-[var(--color-border)] flex flex-col gap-3">
+                                <Button 
+                                    className="w-full" 
+                                    onClick={async () => {
+                                        const shipMethod = shippingForm.city?.includes("تهران") ? "peyk" : "post";
+                                        try {
+                                            const { data } = await axios.patch(`/api/invoices/${selectedInvoice._id}/payment-method`, {
+                                                paymentMethod: 'bank_transfer',
+                                                shippingMethod: shipMethod,
+                                                shippingAddress: shippingForm
+                                            });
+                                            if (data.success) {
+                                                toast.success("اطلاعات واریز و آدرس ثبت شد. منتظر تایید مدیریت باشید.");
+                                                setIsPaymentModalOpen(false);
+                                                setSelectedMethod(null);
+                                                fetchInvoices();
+                                            }
+                                        } catch (error) {
+                                            toast.error("خطا در ثبت اطلاعات");
+                                        }
+                                    }}
+                                >
+                                    تایید و ثبت واریز
+                                </Button>
+                                <Button variant="secondary" className="w-full" onClick={() => setSelectedMethod(null)}>
+                                    بازگشت به انتخاب روش پرداخت
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                     
                     <div className="pt-4 border-t border-[var(--color-border)] text-center">
                         <p className="text-[10px] text-[var(--color-text-tertiary)] italic">
-                            پس از انتخاب روش‌های غیرآنلاین، اطلاعات واریز توسط ادمین برای شما ارسال می‌شود.
+                            پس از انتخاب روش‌های غیرآنلاین، اطلاعات واریز برای شما ثبت شده و پس از تایید مدیریت، فاکتور تسویه خواهد شد.
                         </p>
                     </div>
                 </div>

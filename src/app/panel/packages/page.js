@@ -41,6 +41,13 @@ const ProductSchema = Yup.object().shape({
     price: Yup.number().min(0, "قیمت نمی‌تواند منفی باشد").required("قیمت الزامی است"),
     stock: Yup.number().min(0, "موجودی نمی‌تواند منفی باشد").default(0),
     sku: Yup.string(),
+    weight: Yup.number().min(0, "وزن نمی‌تواند منفی باشد"),
+    material: Yup.string(),
+    dimensions: Yup.object().shape({
+        length: Yup.number().min(0),
+        width: Yup.number().min(0),
+        height: Yup.number().min(0),
+    }),
     isActive: Yup.boolean(),
 });
 
@@ -403,6 +410,13 @@ export default function ProductsPage() {
                         images: [],
                         isActive: true,
                         order: 0,
+                        weight: 0,
+                        material: "",
+                        dimensions: {
+                            length: 0,
+                            width: 0,
+                            height: 0,
+                        },
                     }}
                     validationSchema={ProductSchema}
                     onSubmit={(values, actions) => {
@@ -463,6 +477,22 @@ export default function ProductsPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <InputField name="price" label="قیمت (تومان)" type="number" required />
                                 <InputField name="stock" label="موجودی انبار" type="number" />
+                            </div>
+
+                            {/* Row 4: Weight + Material */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <InputField name="weight" label="وزن (گرم)" type="number" />
+                                <InputField name="material" label="جنس / متریال" placeholder="مثلاً: استیل، پلاستیک ABS" />
+                            </div>
+
+                            {/* Row 5: Dimensions */}
+                            <div className="bg-gray-50 dark:bg-black/20 p-4 rounded-xl border border-[var(--color-border)]">
+                                <label className="block text-sm font-black text-[var(--color-text-primary)] mb-3">ابعاد محصول (سانتی‌متر)</label>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <InputField name="dimensions.length" label="طول" type="number" />
+                                    <InputField name="dimensions.width" label="عرض" type="number" />
+                                    <InputField name="dimensions.height" label="ارتفاع" type="number" />
+                                </div>
                             </div>
 
                             {/* Description */}

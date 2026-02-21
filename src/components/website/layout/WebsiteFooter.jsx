@@ -48,6 +48,19 @@ export default function WebsiteFooter() {
                         <Instagram size={20} />
                     </a>
                 </div>
+                <div className="flex justify-center mb-6">
+                    <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=701546&Code=kQhdBY6Mi0OEMwAYP0SAXJpelRU5jiHU'>
+                            <img 
+                                referrerpolicy='origin' 
+                                src='https://trustseal.enamad.ir/logo.aspx?id=701546&Code=kQhdBY6Mi0OEMwAYP0SAXJpelRU5jiHU' 
+                                alt='Enamad' 
+                                style={{ cursor: 'pointer', height: '80px', width: 'auto' }} 
+                            />
+                        </a>
+                    </div>
+                </div>
+
                 <div className="copyright">
                     © 2024-{currentYear} نگین تجهیز سپهر (NeginTS). تمامی حقوق محفوظ است.
                 </div>

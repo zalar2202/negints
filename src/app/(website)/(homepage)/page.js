@@ -117,7 +117,7 @@ export default function HomePage() {
             "contactType": "customer service",
             "address": {
                 "@type": "PostalAddress",
-                "streetAddress": "خیابان آزادی، نبش جمالزاده جنوبی، برج آفتاب، طبقه14، واحد 11",
+                "streetAddress": "خیابان آزادی، نبش جمالزاده جنوبی، پلاک ۷۲، برج آفتاب، طبقه ۱۴، واحد ۱۱",
                 "addressLocality": "تهران",
                 "addressCountry": "IR"
             }

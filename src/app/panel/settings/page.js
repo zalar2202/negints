@@ -782,8 +782,8 @@ export default function SettingsPage() {
             icon: <SettingsIcon className="w-4 h-4" />,
             content: <PreferencesTab />,
         },
-        // Only show payment gateway settings for admins/managers
-        ...(isAdmin ? [{
+        // Only show payment gateway settings for admins
+        ...(user.role === 'admin' ? [{
             id: "payments",
             label: "درگاه پرداخت",
             icon: <CreditCard className="w-4 h-4" />,

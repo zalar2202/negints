@@ -48,6 +48,10 @@ const PackageSchema = new mongoose.Schema(
             width: { type: Number, default: 0 },
             height: { type: Number, default: 0 },
         },
+        material: {
+            type: String,
+            trim: true,
+        },
         specifications: [
             {
                 key: String,

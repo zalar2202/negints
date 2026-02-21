@@ -14,9 +14,9 @@ export async function PATCH(request, { params }) {
         }
 
         const body = await request.json();
-        const { paymentMethod } = body;
+        const { paymentMethod, shippingMethod, shippingAddress } = body;
 
-        if (!['bank_transfer', 'crypto', 'cash', 'other'].includes(paymentMethod)) {
+        if (!['bank_transfer', 'crypto', 'cash', 'other', 'stripe', 'zarinpal'].includes(paymentMethod)) {
             return NextResponse.json({ error: 'Invalid payment method' }, { status: 400 });
         }
 
@@ -35,6 +35,8 @@ export async function PATCH(request, { params }) {
         }
 
         invoice.paymentMethod = paymentMethod;
+        if (shippingMethod) invoice.shippingMethod = shippingMethod;
+        if (shippingAddress) invoice.shippingAddress = shippingAddress;
         await invoice.save();
 
         return NextResponse.json({ 

@@ -13,7 +13,8 @@ export default async function sitemap() {
         '/products/instruments',
         '/products/healthcare',
         '/products/pharma',
-        '/about'
+        '/about',
+        '/contact-us'
     ].map((route) => ({
         url: `${baseUrl}${route}`,
         lastModified: new Date(),

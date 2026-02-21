@@ -19,7 +19,7 @@ export default function GlobalCTA({
         email: "info@negints.com",
         phone: "۰۲۱-۶۵۰۲۳۹۸۰",
         phoneRaw: "+982165023980",
-        address: "خیابان آزادی، نبش جمالزاده جنوبی، برج آفتاب، طبقه14، واحد 11"
+        address: "خیابان آزادی، نبش جمالزاده جنوبی، پلاک ۷۲، برج آفتاب، طبقه ۱۴، واحد ۱۱"
     };
 
     return (
