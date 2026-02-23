@@ -18,6 +18,20 @@ function formatCurrency(amount) {
     return `${formatted} تومان`;
 }
 
+function getEmbedUrl(url) {
+    if (!url || typeof url !== 'string') return url;
+    try {
+        // Handle Aparat watch URLs (e.g., https://www.aparat.com/v/12345)
+        if (url.includes('aparat.com/v/')) {
+            const match = url.match(/\/v\/([a-zA-Z0-9]+)/);
+            if (match && match[1]) {
+                return `https://www.aparat.com/video/video/embed/videohash/${match[1]}/vt/frame`;
+            }
+        }
+    } catch (e) {}
+    return url;
+}
+
 export default function ProductPageClient({ product, category, relatedProducts }) {
     const router = useRouter();
     const { user, isAuthenticated } = useAuth();
@@ -123,7 +137,7 @@ export default function ProductPageClient({ product, category, relatedProducts }
                                         ) : galleryItems[selectedImage].url.match(/\.(mp4|webm|ogg)$/i) ? (
                                             <video src={galleryItems[selectedImage].url} controls className="w-full h-full object-contain" />
                                         ) : (
-                                            <iframe src={galleryItems[selectedImage].url} className="w-full h-full" allowFullScreen frameBorder="0" />
+                                            <iframe src={getEmbedUrl(galleryItems[selectedImage].url)} className="w-full h-full" allowFullScreen frameBorder="0" />
                                         )}
                                     </div>
                                 )
