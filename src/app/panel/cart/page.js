@@ -327,6 +327,11 @@ export default function CartPage() {
                                                  {item.package?.name || "پکیج خدمات"}
                                              </h3>
                                          </div>
+                                         {item.size && (
+                                             <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mb-2 mt-[-5px]" style={{ direction: 'rtl', textAlign: 'right' }}>
+                                                 سایز: {item.size}
+                                             </p>
+                                         )}
                                          <p className="text-sm text-[var(--color-text-secondary)] line-clamp-1 mb-4 font-bold opacity-80">
                                              دسته‌بندی: {item.package?.categoryId?.name || item.package?.displayCategory || item.package?.category || "سرویس‌های دیجیتال"}
                                          </p>

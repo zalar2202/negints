@@ -10,7 +10,7 @@ import { useCart } from "@/contexts/CartContext";
 import CommentSection from "@/components/website/CommentSection";
 import {
     ChevronRight, ShoppingCart, Share2, Heart, Check, CheckCircle2,
-    Package as PackageIcon, Eye, ArrowLeft, Star, Truck, Shield
+    Package as PackageIcon, Eye, ArrowLeft, Star, Truck, Shield, Play, Info
 } from "lucide-react";
 
 function formatCurrency(amount) {
@@ -23,10 +23,15 @@ export default function ProductPageClient({ product, category, relatedProducts }
     const { user, isAuthenticated } = useAuth();
     const { refreshCart } = useCart();
     const [selectedImage, setSelectedImage] = useState(0);
+    const [selectedSize, setSelectedSize] = useState("");
     const [copied, setCopied] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
 
-    const images = product.images?.length > 0 ? product.images : [];
+    const initialImages = product.images?.length > 0 ? product.images.map(url => ({ type: 'image', url })) : [];
+    if (product.videoUrl) {
+        initialImages.push({ type: 'video', url: product.videoUrl });
+    }
+    const galleryItems = initialImages;
     const features = product.features || [];
 
     const handleShare = async () => {
@@ -47,11 +52,17 @@ export default function ProductPageClient({ product, category, relatedProducts }
             return;
         }
 
+        if (product.sizes?.length > 0 && !selectedSize) {
+            toast.error("لطفاً سایز مورد نظر خود را انتخاب کنید");
+            return;
+        }
+
         setIsAdding(true);
         try {
             const { data } = await axios.post('/api/cart', { 
                 packageId: product._id,
-                quantity: 1
+                quantity: 1,
+                size: selectedSize || undefined
             });
 
             if (data.success) {
@@ -93,14 +104,29 @@ export default function ProductPageClient({ product, category, relatedProducts }
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     {/* Image Gallery */}
                     <div className="space-y-4">
-                        {/* Main Image */}
+                        {/* Main Image/Video */}
                         <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-[var(--color-border)]">
-                            {images.length > 0 ? (
-                                <img
-                                    src={images[selectedImage]}
-                                    alt={product.name}
-                                    className="w-full h-full object-contain p-4"
-                                />
+                            {galleryItems.length > 0 ? (
+                                galleryItems[selectedImage].type === 'image' ? (
+                                    <img
+                                        src={galleryItems[selectedImage].url}
+                                        alt={product.name}
+                                        className="w-full h-full object-contain p-4 bg-white dark:bg-gray-800"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-black">
+                                        {galleryItems[selectedImage].url.trim().startsWith('<') ? (
+                                            <div 
+                                                dangerouslySetInnerHTML={{ __html: galleryItems[selectedImage].url }} 
+                                                className="w-full h-full flex items-center justify-center [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:rounded-none"
+                                            />
+                                        ) : galleryItems[selectedImage].url.match(/\.(mp4|webm|ogg)$/i) ? (
+                                            <video src={galleryItems[selectedImage].url} controls className="w-full h-full object-contain" />
+                                        ) : (
+                                            <iframe src={galleryItems[selectedImage].url} className="w-full h-full" allowFullScreen frameBorder="0" />
+                                        )}
+                                    </div>
+                                )
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
                                     <PackageIcon size={80} className="text-gray-300" />
@@ -109,18 +135,24 @@ export default function ProductPageClient({ product, category, relatedProducts }
                         </div>
 
                         {/* Thumbnails */}
-                        {images.length > 1 && (
+                        {galleryItems.length > 1 && (
                             <div className="flex gap-3 overflow-x-auto pb-2">
-                                {images.map((img, idx) => (
+                                {galleryItems.map((item, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => setSelectedImage(idx)}
-                                        className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${selectedImage === idx
+                                        className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all relative ${selectedImage === idx
                                                 ? "border-[var(--color-primary)] ring-2 ring-[var(--color-primary)]/30"
                                                 : "border-[var(--color-border)] hover:border-[var(--color-primary)]/50"
                                             }`}
                                     >
-                                        <img src={img} alt={`${product.name} - ${idx + 1}`} className="w-full h-full object-cover" />
+                                        {item.type === 'image' ? (
+                                            <img src={item.url} alt={`${product.name} - ${idx + 1}`} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full bg-black flex items-center justify-center text-white/50">
+                                                <Play size={24} />
+                                            </div>
+                                        )}
                                     </button>
                                 ))}
                             </div>
@@ -176,6 +208,38 @@ export default function ProductPageClient({ product, category, relatedProducts }
                                 )}
                             </div>
                         </div>
+
+                        {/* Size Picker */}
+                        {product.sizes?.length > 0 && (
+                            <div className="pt-2">
+                                <div className="flex justify-between items-center mb-3">
+                                    <h3 className="text-sm font-black text-[var(--color-text-primary)]">
+                                        انتخاب سایز
+                                    </h3>
+                                    {(category?.name === "جوراب واریس" || category?.slug === "جوراب-واریس" || (typeof category === 'string' && category.includes("واریس"))) && (
+                                        <a href="/stockings-size.pdf" target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-500 hover:text-indigo-600 font-bold flex items-center gap-1 transition-colors">
+                                            <Info size={14} />
+                                            راهنمای انتخاب سایز
+                                        </a>
+                                    )}
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {product.sizes.map((size, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setSelectedSize(size)}
+                                            className={`min-w-[48px] px-3 py-2 rounded-xl text-sm font-bold border-2 transition-all ${
+                                                selectedSize === size 
+                                                    ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+                                                    : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]/50 bg-[var(--color-background-elevated)]"
+                                            }`}
+                                        >
+                                            {size}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-3">

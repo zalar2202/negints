@@ -12,7 +12,7 @@ import { Formik, Form } from "formik";
 import {
     Plus, Edit, Trash2, Package as PackageIcon, Save, X,
     Upload, Image as ImageIcon, Eye, EyeOff, Search, Filter,
-    FolderPlus, Tag, BarChart3, ArrowUpDown
+    FolderPlus, Tag, BarChart3, ArrowUpDown, Star
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
@@ -48,6 +48,8 @@ const ProductSchema = Yup.object().shape({
         width: Yup.number().min(0),
         height: Yup.number().min(0),
     }),
+    sizes: Yup.string(),
+    videoUrl: Yup.string(),
     isActive: Yup.boolean(),
 });
 
@@ -142,6 +144,9 @@ export default function ProductsPage() {
                 features: typeof values.features === "string"
                     ? values.features.split("\n").filter(f => f.trim())
                     : values.features,
+                sizes: typeof values.sizes === "string"
+                    ? values.sizes.split("\n").filter(s => s.trim())
+                    : values.sizes,
             };
 
             if (editingProduct) {
@@ -397,6 +402,8 @@ export default function ProductsPage() {
                         categoryId: editingProduct.categoryId?._id || editingProduct.categoryId || "",
                         slug: editingProduct.slug || "",
                         features: Array.isArray(editingProduct.features) ? editingProduct.features.join("\n") : (editingProduct.features || ""),
+                        sizes: Array.isArray(editingProduct.sizes) ? editingProduct.sizes.join("\n") : (editingProduct.sizes || ""),
+                        videoUrl: editingProduct.videoUrl || "",
                     } : {
                         name: "",
                         slug: "",
@@ -407,6 +414,8 @@ export default function ProductsPage() {
                         sku: "",
                         description: "",
                         features: "",
+                        sizes: "",
+                        videoUrl: "",
                         images: [],
                         isActive: true,
                         order: 0,
@@ -517,6 +526,19 @@ export default function ProductsPage() {
                                 />
                             </div>
 
+                            {/* Sizes */}
+                            <div className="space-y-1">
+                                <label className="text-sm font-black text-[var(--color-text-primary)]">سایزها (هر خط یک سایز)</label>
+                                <textarea
+                                    className="w-full p-3 rounded-lg border bg-[var(--color-background-elevated)] border-[var(--color-border)] text-[var(--color-text-primary)] focus:ring-2 focus:ring-[var(--color-primary)] outline-none min-h-[80px]"
+                                    value={values.sizes}
+                                    onChange={(e) => setFieldValue("sizes", e.target.value)}
+                                    placeholder={"S\nM\nL"}
+                                />
+                            </div>
+
+                            <InputField name="videoUrl" label="لینک ویدیو محصول" placeholder="لینک مستقیم ویدیو برای نمایش در گالری" dir="ltr" className="text-left" />
+
                             {/* ========== Image Upload Section ========== */}
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
@@ -532,6 +554,22 @@ export default function ProductsPage() {
                                         <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden border-2 border-[var(--color-border)] hover:border-indigo-500/50 transition-all">
                                             <img src={img} alt={`تصویر ${idx + 1}`} className="w-full h-full object-cover" />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                {idx !== 0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newImages = [...values.images];
+                                                            const temp = newImages[0];
+                                                            newImages[0] = newImages[idx];
+                                                            newImages[idx] = temp;
+                                                            setFieldValue("images", newImages);
+                                                        }}
+                                                        className="p-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 active:scale-90 transition-all"
+                                                        title="تنظیم عکس اصلی"
+                                                    >
+                                                        <Star size={14} />
+                                                    </button>
+                                                )}
                                                 <button
                                                     type="button"
                                                     onClick={() => setFieldValue("images", values.images.filter((_, i) => i !== idx))}

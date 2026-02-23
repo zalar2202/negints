@@ -16,6 +16,10 @@ const CartItemSchema = new mongoose.Schema({
         enum: ["monthly", "quarterly", "semi-annually", "annually", "one-time"],
         default: "one-time",
     },
+    size: {
+        type: String,
+        trim: true,
+    },
 });
 
 const CartSchema = new mongoose.Schema(

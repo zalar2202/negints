@@ -76,7 +76,7 @@ export async function POST(request) {
         const user = await verifyAuth(request);
         if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        const { packageId, quantity = 1, billingCycle = "one-time", userId } = await request.json();
+        const { packageId, quantity = 1, billingCycle = "one-time", userId, size } = await request.json();
         const isAdmin = ["admin", "manager"].includes(user.role);
         const cartUserId = (isAdmin && userId) ? userId : user._id;
 
@@ -85,15 +85,15 @@ export async function POST(request) {
             cart = new Cart({ user: cartUserId, items: [] });
         }
 
-        // Check if item exists
+        // Check if item exists with same package and size
         const existingItemIndex = cart.items.findIndex(
-            (item) => item.package.toString() === packageId
+            (item) => item.package.toString() === packageId && item.size === size
         );
 
         if (existingItemIndex > -1) {
             cart.items[existingItemIndex].quantity += quantity;
         } else {
-            cart.items.push({ package: packageId, quantity, billingCycle });
+            cart.items.push({ package: packageId, quantity, billingCycle, size });
         }
 
         await cart.save();
