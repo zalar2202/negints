@@ -46,6 +46,7 @@ const nextConfig = {
             font-src 'self' data: https://fonts.gstatic.com;
             object-src 'none';
             base-uri 'self';
+            frame-src 'self' https://aparat.com https://www.aparat.com;
             form-action 'self';
             frame-ancestors 'none';
             connect-src 'self' https://www.google-analytics.com https://*.cloudflare.com https://*.cloudflareinsights.com;

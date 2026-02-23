@@ -223,20 +223,32 @@ export default function ProductPageClient({ product, category, relatedProducts }
                                         </a>
                                     )}
                                 </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {product.sizes.map((size, idx) => (
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {product.sizes.map((sizeObj, idx) => {
+                                        const sName = typeof sizeObj === 'string' ? sizeObj : sizeObj.size;
+                                        const sStock = typeof sizeObj === 'string' ? product.stock : sizeObj.stock;
+                                        const isOutOfStock = sStock <= 0;
+                                        return (
                                         <button
                                             key={idx}
-                                            onClick={() => setSelectedSize(size)}
-                                            className={`min-w-[48px] px-3 py-2 rounded-xl text-sm font-bold border-2 transition-all ${
-                                                selectedSize === size 
+                                            disabled={isOutOfStock}
+                                            onClick={() => setSelectedSize(sName)}
+                                            className={`min-w-[48px] px-3 py-2.5 rounded-xl text-sm font-bold border-2 transition-all relative ${
+                                                selectedSize === sName 
                                                     ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
-                                                    : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]/50 bg-[var(--color-background-elevated)]"
+                                                    : isOutOfStock
+                                                        ? "border-[var(--color-border)] text-[var(--color-text-tertiary)] bg-gray-100 dark:bg-gray-800/40 opacity-50 cursor-not-allowed"
+                                                        : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]/50 bg-[var(--color-background-elevated)]"
                                             }`}
                                         >
-                                            {size}
+                                            {sName}
+                                            {selectedSize === sName && sStock < 5 && sStock > 0 && (
+                                                <span className="absolute -top-2.5 -right-2 bg-amber-500 text-white text-[9px] px-1.5 py-0.5 font-bold rounded-lg shadow-sm border border-white dark:border-gray-900 z-10">
+                                                    تنها {sStock} عدد
+                                                </span>
+                                            )}
                                         </button>
-                                    ))}
+                                    )})}
                                 </div>
                             </div>
                         )}
@@ -245,11 +257,17 @@ export default function ProductPageClient({ product, category, relatedProducts }
                         <div className="flex flex-col sm:flex-row gap-3">
                             <button
                                 onClick={handleAddToCart}
-                                disabled={isAdding || product.stock <= 0}
+                                disabled={isAdding || (product.sizes?.length > 0 && selectedSize ? (() => {
+                                    const sObj = product.sizes.find(s => (typeof s === 'string' ? s : s.size) === selectedSize);
+                                    return (sObj && typeof sObj !== 'string' ? sObj.stock : product.stock) <= 0;
+                                })() : product.stock <= 0)}
                                 className="flex-[2] inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-bold rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[var(--color-primary)]/20"
                             >
                                 {isAdding ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <ShoppingCart size={20} />}
-                                {product.stock > 0 ? "افزودن به سبد و خرید آنلاین" : "ناموجود"}
+                                {(product.sizes?.length > 0 && selectedSize ? (() => {
+                                    const sObj = product.sizes.find(s => (typeof s === 'string' ? s : s.size) === selectedSize);
+                                    return (sObj && typeof sObj !== 'string' ? sObj.stock : product.stock) > 0;
+                                })() : product.stock > 0) ? "افزودن به سبد و خرید آنلاین" : "ناموجود"}
                             </button>
                             
 

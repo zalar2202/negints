@@ -145,7 +145,13 @@ export default function ProductsPage() {
                     ? values.features.split("\n").filter(f => f.trim())
                     : values.features,
                 sizes: typeof values.sizes === "string"
-                    ? values.sizes.split("\n").filter(s => s.trim())
+                    ? values.sizes.split("\n").filter(s => s.trim()).map(line => {
+                          if (line.includes(':')) {
+                              const [sSize, sStock] = line.split(':');
+                              return { size: sSize.trim(), stock: parseInt(sStock.trim(), 10) || 0 };
+                          }
+                          return { size: line.trim(), stock: 0 };
+                      })
                     : values.sizes,
             };
 
@@ -402,7 +408,9 @@ export default function ProductsPage() {
                         categoryId: editingProduct.categoryId?._id || editingProduct.categoryId || "",
                         slug: editingProduct.slug || "",
                         features: Array.isArray(editingProduct.features) ? editingProduct.features.join("\n") : (editingProduct.features || ""),
-                        sizes: Array.isArray(editingProduct.sizes) ? editingProduct.sizes.join("\n") : (editingProduct.sizes || ""),
+                        sizes: Array.isArray(editingProduct.sizes) 
+                            ? editingProduct.sizes.map(s => typeof s === 'string' ? s : `${s.size}:${s.stock}`).join("\n") 
+                            : (editingProduct.sizes || ""),
                         videoUrl: editingProduct.videoUrl || "",
                     } : {
                         name: "",
@@ -526,14 +534,14 @@ export default function ProductsPage() {
                                 />
                             </div>
 
-                            {/* Sizes */}
                             <div className="space-y-1">
-                                <label className="text-sm font-black text-[var(--color-text-primary)]">سایزها (هر خط یک سایز)</label>
+                                <label className="text-sm font-black text-[var(--color-text-primary)]">سایزها و موجودی (فرمت: S:10 یا فقط S)</label>
                                 <textarea
-                                    className="w-full p-3 rounded-lg border bg-[var(--color-background-elevated)] border-[var(--color-border)] text-[var(--color-text-primary)] focus:ring-2 focus:ring-[var(--color-primary)] outline-none min-h-[80px]"
                                     value={values.sizes}
                                     onChange={(e) => setFieldValue("sizes", e.target.value)}
-                                    placeholder={"S\nM\nL"}
+                                    placeholder={"S:10\nM:5\nL (بدون موجودی)"}
+                                    dir="ltr"
+                                    className="w-full p-3 text-left font-mono rounded-lg border bg-[var(--color-background-elevated)] border-[var(--color-border)] text-[var(--color-text-primary)] focus:ring-2 focus:ring-[var(--color-primary)] outline-none min-h-[80px]"
                                 />
                             </div>
 

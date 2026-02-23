@@ -78,8 +78,14 @@ const PackageSchema = new mongoose.Schema(
         ],
         sizes: [
             {
-                type: String,
-                trim: true,
+                size: {
+                    type: String,
+                    trim: true,
+                },
+                stock: {
+                    type: Number,
+                    default: 0,
+                }
             },
         ],
         videoUrl: {
