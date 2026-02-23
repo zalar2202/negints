@@ -119,7 +119,7 @@ export default function ProductPageClient({ product, category, relatedProducts }
                     {/* Image Gallery */}
                     <div className="space-y-4">
                         {/* Main Image/Video */}
-                        <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-[var(--color-border)]">
+                        <div className={`rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-[var(--color-border)] ${galleryItems.length > 0 && galleryItems[selectedImage].type === 'video' ? 'aspect-[4/3] sm:aspect-video' : 'aspect-square'}`}>
                             {galleryItems.length > 0 ? (
                                 galleryItems[selectedImage].type === 'image' ? (
                                     <img

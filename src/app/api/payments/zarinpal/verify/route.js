@@ -42,9 +42,19 @@ export async function GET(request) {
             try {
                 for (const item of invoice.items) {
                     if (item.package) {
-                        await Package.findByIdAndUpdate(item.package, {
-                            $inc: { stock: -Math.abs(item.quantity || 1) }
-                        });
+                        const pkg = await Package.findById(item.package);
+                        if (pkg) {
+                            pkg.stock = Math.max(0, pkg.stock - Math.abs(item.quantity || 1));
+                            
+                            // Decrement size specific stock if present
+                            if (item.size && pkg.sizes?.length > 0) {
+                                const sizeIndex = pkg.sizes.findIndex(s => s.size === item.size);
+                                if (sizeIndex !== -1) {
+                                    pkg.sizes[sizeIndex].stock = Math.max(0, pkg.sizes[sizeIndex].stock - Math.abs(item.quantity || 1));
+                                }
+                            }
+                            await pkg.save();
+                        }
                     }
                 }
             } catch (inventoryError) {

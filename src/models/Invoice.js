@@ -4,9 +4,10 @@ const InvoiceItemSchema = new mongoose.Schema({
     description: { type: String, required: true },
     quantity: { type: Number, required: true, min: 1 },
     unitPrice: { type: Number, required: true, min: 0 },
-    package: { type: mongoose.Schema.Types.ObjectId, ref: 'Package' },
-    amount: { type: Number, required: true } // Calculated as q * p
-}, { _id: false });
+        package: { type: mongoose.Schema.Types.ObjectId, ref: 'Package' },
+        size: { type: String },
+        amount: { type: Number, required: true } // Calculated as q * p
+    }, { _id: false });
 
 const InvoiceSchema = new mongoose.Schema(
     {
