@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Linkedin, Twitter, Github, Instagram, Star } from "lucide-react";
 
+import EnamadTrustSeal from "./EnamadTrustSeal";
+
 /**
  * Footer - Simple footer component for NeginTS website pages
  */
@@ -53,9 +55,7 @@ export default function WebsiteFooter() {
                 {/* Enamad Implementation */}
                 <div className="flex justify-center mb-10">
                     <div className="bg-white p-4 rounded-2xl shadow-2xl border border-white/20 hover:scale-105 transition-transform duration-300">
-                        <a referrerPolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=701546&Code=kQhdBY6Mi0OEMwAYP0SAXJpelRU5jiHU'>
-                            <img referrerPolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=701546&Code=kQhdBY6Mi0OEMwAYP0SAXJpelRU5jiHU' alt='' style={{ cursor: 'pointer' }} code='kQhdBY6Mi0OEMwAYP0SAXJpelRU5jiHU' />
-                        </a>
+                        <EnamadTrustSeal />
                     </div>
                 </div>
 
