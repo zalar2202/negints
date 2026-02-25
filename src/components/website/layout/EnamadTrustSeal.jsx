@@ -1,5 +1,8 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
+
 export default function EnamadTrustSeal() {
     const handleEnamadClick = (e) => {
         e.preventDefault();
@@ -7,7 +10,7 @@ export default function EnamadTrustSeal() {
     };
 
     return (
-        <a 
+        <Link 
             href='https://trustseal.enamad.ir/?id=701546&Code=kQhdBY6Mi0OEMwAYP0SAXJpelRU5jiHU'
             target='_blank' 
             rel="noopener noreferrer"
@@ -15,13 +18,14 @@ export default function EnamadTrustSeal() {
             className="block"
             title="نماد اعتماد الکترونیکی"
         >
-            <img 
+            <Image 
                 src='/assets/logo/enamad.png' 
                 alt='نماد اعتماد الکترونیکی' 
                 width={64}
                 height={64}
-                style={{ cursor: 'pointer', display: 'block' }}
+                className="cursor-pointer block"
+                priority
             />
-        </a>
+        </Link>
     );
 }
