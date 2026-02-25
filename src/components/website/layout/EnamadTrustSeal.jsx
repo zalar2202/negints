@@ -25,6 +25,7 @@ export default function EnamadTrustSeal() {
                 height={64}
                 className="cursor-pointer block"
                 priority
+                unoptimized
             />
         </Link>
     );
